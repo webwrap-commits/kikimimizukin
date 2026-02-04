@@ -5,238 +5,116 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>きき耳ずきん</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;700&family=Noto+Sans+JP:wght@300;400&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        :root {
-            --primary-color: #6d4c41;
-            --accent-color: #a1887f;
-            --bg-color: #fdfbf7;
-            --card-bg: #ffffff;
-            --text-color: #4a4a4a;
-        }
-
         body {
-            font-family: 'Noto Sans JP', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            font-family: sans-serif;
             margin: 0;
-            line-height: 1.8;
+            padding: 0;
+            background-color: #fff;
+            color: #333;
+            line-height: 1.6;
         }
-
-        h1, h2, .mincho {
-            font-family: 'Zen Old Mincho', serif;
-        }
-
         header {
-            background-color: var(--card-bg);
             padding: 1rem 1.5rem;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-bottom: 1px solid #eee;
         }
-
-        .logo {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            letter-spacing: 0.1em;
-        }
-
         .container {
             max-width: 600px;
             margin: 0 auto;
-            padding: 0 1.5rem; /* 全体の左右余白 */
+            padding: 0 1.5rem;
         }
-
-        /* イントロカード */
-        .intro-card {
-            background: var(--card-bg);
-            margin: 2rem 0;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        .intro-section {
+            margin: 20px 0;
         }
-
-        .intro-text {
-            padding: 1.5rem;
-            font-size: 0.95rem;
-            white-space: pre-wrap;
-            color: var(--text-color);
-        }
-
-        /* イラストを左右いっぱいにする */
-        .intro-illustration {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        /* ボタンエリア */
-        .action-area {
-            text-align: center;
-            margin: 1.5rem 0; /* 上下を少し詰めた */
-        }
-
-        .btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 10px rgba(109, 76, 65, 0.3);
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        /* タイムラインタイトル */
-        .section-title {
-            font-size: 1.4rem;
-            margin: 2rem 0 1rem;
-            color: var(--primary-color);
-            font-weight: 700;
-        }
-
-        /* 投稿カード */
-        .post-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-            border-left: 4px solid var(--accent-color);
-        }
-
-        .post-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            color: #888;
-            margin-bottom: 0.5rem;
-        }
-
-        .post-location {
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
+        /* イラストは左右の余白なし */
+        .intro-img {
+            width: calc(100% + 3rem);
+            margin-left: -1.5rem;
+            height: 200px;
+            background-color: #f0f0f0;
             display: flex;
             align-items: center;
-            gap: 5px;
+            justify-content: center;
+            object-fit: cover;
         }
-
-        .post-content {
+        .intro-text {
+            white-space: pre-wrap;
+            margin-top: 20px;
+            font-size: 0.95rem;
+        }
+        .action-area {
+            text-align: center;
+            margin: 10px 0; /* 上下を詰めた */
+        }
+        .main-btn {
+            padding: 12px 24px;
             font-size: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .map-btn {
-            background: none;
-            border: 1px solid var(--accent-color);
-            color: var(--accent-color);
-            padding: 0.4rem 1rem;
+            background: #333;
+            color: #fff;
+            border: none;
             border-radius: 4px;
-            font-size: 0.8rem;
             cursor: pointer;
         }
-
-        /* モーダル */
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 20px 0 10px;
+        }
+        .post-card {
+            border: 1px solid #eee;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
         .modal {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 2000;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
             align-items: center;
             justify-content: center;
         }
-
         .modal-content {
-            background: white;
+            background: #fff;
+            padding: 20px;
             width: 90%;
             max-width: 500px;
-            padding: 1.5rem;
-            border-radius: 15px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        textarea {
-            width: 100%;
-            height: 120px;
-            border: 1px solid #ddd;
             border-radius: 8px;
-            padding: 10px;
-            margin: 10px 0;
-            box-sizing: border-box;
-            font-family: inherit;
         }
-
-        #map-container {
-            height: 250px;
-            margin: 10px 0;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-        }
-
-        /* 地図選択ボタンのレスポンシブ */
-        .map-selector-btns {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
+        #map { height: 200px; margin: 10px 0; }
+        .map-btns { display: flex; gap: 10px; margin-bottom: 10px; }
+        
+        /* スマホでボタンを縦2行に */
         @media (max-width: 480px) {
-            .map-selector-btns {
-                flex-direction: column; /* スマホで縦2行 */
-            }
-            .map-selector-btns button {
-                width: 100%;
-            }
+            .map-btns { flex-direction: column; }
         }
-
+        
         .small-btn {
             flex: 1;
             padding: 8px;
-            font-size: 0.85rem;
-            border: 1px solid var(--primary-color);
-            background: white;
-            color: var(--primary-color);
-            border-radius: 4px;
+            border: 1px solid #ccc;
+            background: #fff;
             cursor: pointer;
         }
-
-        .small-btn.active {
-            background: var(--primary-color);
-            color: white;
-        }
-
         .hidden { display: none; }
-
-        footer-nav {
-            display: none; /* シンプルにするため一旦非表示 */
-        }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo">きき耳ずきん</div>
-    <button class="map-btn" onclick="toggleView()" id="view-toggle-btn">マイページ</button>
+    <div style="font-weight:bold;">きき耳ずきん</div>
+    <button onclick="toggleView()" id="nav-btn">マイページ</button>
 </header>
 
 <div class="container" id="main-view">
-    <div class="intro-card">
-        <img src="https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=1000&auto=format&fit=crop" alt="森の小道" class="intro-illustration">
-        <div class="intro-text mincho">きき耳ずきんをかぶると、街が少しやさしくなる。
+    <div class="intro-section">
+        <div class="intro-img">イラスト</div>
+        <div class="intro-text">きき耳ずきんをかぶると、街が少しやさしくなる。
 いつも通っている道のはずなのに、
 橋のたもとや池のそば、名もない場所から、
 小さな声が聞こえてくる。
@@ -250,158 +128,106 @@
     </div>
 
     <div class="action-area">
-        <button class="btn mincho" onclick="openModal()">きき耳を残す</button>
+        <button class="main-btn" onclick="openModal()">きき耳を残す</button>
     </div>
 
-    <h2 class="section-title">きき耳をたてる</h2>
+    <div class="section-title">きき耳をたてる</div>
 
-    <div id="post-list">
-        </div>
+    <div id="post-list"></div>
 </div>
 
 <div class="container hidden" id="mypage-view">
-    <h2 class="section-title">自分のきき耳</h2>
+    <div class="section-title">自分のきき耳</div>
     <div id="my-post-list"></div>
 </div>
 
 <div class="modal" id="post-modal">
     <div class="modal-content">
-        <h3 class="mincho">今のきき耳を綴る</h3>
-        
-        <div class="map-selector-btns">
-            <button class="small-btn" onclick="setLocationMode('current')">現在地から</button>
-            <button class="small-btn" onclick="setLocationMode('search')">場所検索からピンを立てる</button>
+        <h3>今のきき耳を綴る</h3>
+        <div class="map-btns">
+            <button class="small-btn" onclick="setCurrentLocation()">現在地から</button>
+            <button class="small-btn" onclick="alert('検索機能は準備中です')">場所検索からピンを立てる</button>
         </div>
-
-        <input type="text" id="location-name" placeholder="場所の名前（例：〇〇神社の境内）" style="width:100%; padding:8px; box-sizing:border-box; border:1px solid #ddd; border-radius:4px;">
-        
-        <div id="map-container"></div>
-        <p style="font-size: 0.7rem; color: #888;">※地図をタップしてピンを微調整できます</p>
-
-        <textarea id="post-text" placeholder="聞こえてきた声、心に残ったこと..."></textarea>
-        
-        <div style="display: flex; gap: 10px;">
-            <button class="btn" style="flex: 1; background: #ccc;" onclick="closeModal()">やめる</button>
-            <button class="btn" style="flex: 2;" onclick="submitPost()">そっと置いていく</button>
+        <div id="map"></div>
+        <input type="text" id="loc-name" placeholder="場所の名前" style="width:100%; margin:10px 0; padding:8px; box-sizing:border-box;">
+        <textarea id="post-body" placeholder="内容を入力してください" style="width:100%; height:80px; padding:8px; box-sizing:border-box;"></textarea>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+            <button onclick="closeModal()" style="flex:1;">キャンセル</button>
+            <button onclick="savePost()" style="flex:1; background:#333; color:#fff; border:none;">そっと置いていく</button>
         </div>
     </div>
 </div>
 
 <script>
     let map, marker;
-    let selectedCoords = [35.6812, 139.7671]; // デフォルト東京駅
-    let posts = JSON.parse(localStorage.getItem('kikimimi_posts') || '[]');
+    let currentCoords = [35.6812, 139.7671];
+    let posts = JSON.parse(localStorage.getItem('kikimimi_data') || '[]');
 
     function initMap() {
-        map = L.map('map-container').setView(selectedCoords, 15);
+        map = L.map('map').setView(currentCoords, 15);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-        
-        marker = L.marker(selectedCoords, {draggable: true}).addTo(map);
-        
-        map.on('click', function(e) {
+        marker = L.marker(currentCoords, {draggable: true}).addTo(map);
+        map.on('click', e => {
             marker.setLatLng(e.latlng);
-            selectedCoords = [e.latlng.lat, e.latlng.lng];
-        });
-
-        marker.on('dragend', function(e) {
-            const pos = marker.getLatLng();
-            selectedCoords = [pos.lat, pos.lng];
+            currentCoords = [e.latlng.lat, e.latlng.lng];
         });
     }
 
     function openModal() {
         document.getElementById('post-modal').style.display = 'flex';
-        if (!map) {
-            setTimeout(initMap, 100);
-        } else {
-            map.invalidateSize();
-        }
+        if (!map) { setTimeout(initMap, 100); }
     }
 
     function closeModal() {
         document.getElementById('post-modal').style.display = 'none';
     }
 
-    function setLocationMode(mode) {
-        if (mode === 'current') {
-            navigator.geolocation.getCurrentPosition(pos => {
-                const {latitude, longitude} = pos.coords;
-                selectedCoords = [latitude, longitude];
-                map.setView(selectedCoords, 15);
-                marker.setLatLng(selectedCoords);
-            });
-        } else {
-            alert('場所検索機能は現在準備中です。地図を直接タップして場所を選んでください。');
-        }
-    }
-
-    function submitPost() {
-        const text = document.getElementById('post-text').value;
-        const locName = document.getElementById('location-name').value || "名もない場所";
-        
-        if (!text) return alert("内容を入力してください");
-
-        const newPost = {
-            id: Date.now(),
-            text: text,
-            locationName: locName,
-            coords: selectedCoords,
-            date: new Date().toLocaleString()
-        };
-
-        posts.unshift(newPost);
-        localStorage.setItem('kikimimi_posts', JSON.stringify(posts));
-        
-        document.getElementById('post-text').value = '';
-        document.getElementById('location-name').value = '';
-        closeModal();
-        renderPosts();
-    }
-
-    function renderPosts() {
-        const list = document.getElementById('post-list');
-        const myList = document.getElementById('my-post-list');
-        list.innerHTML = '';
-        myList.innerHTML = '';
-
-        posts.forEach(post => {
-            const card = `
-                <div class="post-card">
-                    <div class="post-header">
-                        <span>${post.date}</span>
-                    </div>
-                    <div class="post-location">📍 ${post.locationName}</div>
-                    <div class="post-content">${post.text}</div>
-                    <button class="map-btn" onclick="viewMap(${post.coords[0]}, ${post.coords[1]})">地図を表示</button>
-                </div>
-            `;
-            list.innerHTML += card;
-            myList.innerHTML += card;
+    function setCurrentLocation() {
+        navigator.geolocation.getCurrentPosition(p => {
+            currentCoords = [p.coords.latitude, p.coords.longitude];
+            map.setView(currentCoords, 15);
+            marker.setLatLng(currentCoords);
         });
     }
 
-    function viewMap(lat, lng) {
-        window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
+    function savePost() {
+        const text = document.getElementById('post-body').value;
+        const loc = document.getElementById('loc-name').value || '名もない場所';
+        if (!text) return;
+
+        posts.unshift({
+            id: Date.now(),
+            text,
+            loc,
+            coords: currentCoords,
+            date: new Date().toLocaleString()
+        });
+        localStorage.setItem('kikimimi_data', JSON.stringify(posts));
+        location.reload();
+    }
+
+    function render() {
+        const list = document.getElementById('post-list');
+        const myList = document.getElementById('my-post-list');
+        posts.forEach(p => {
+            const html = `<div class="post-card">
+                <div style="font-size:0.8rem; color:#888;">${p.date}</div>
+                <div style="font-weight:bold; margin:5px 0;">📍 ${p.loc}</div>
+                <div>${p.text}</div>
+            </div>`;
+            list.innerHTML += html;
+            myList.innerHTML += html;
+        });
     }
 
     function toggleView() {
-        const main = document.getElementById('main-view');
-        const mypage = document.getElementById('mypage-view');
-        const btn = document.getElementById('view-toggle-btn');
-
-        if (main.classList.contains('hidden')) {
-            main.classList.remove('hidden');
-            mypage.classList.add('hidden');
-            btn.innerText = 'マイページ';
-        } else {
-            main.classList.add('hidden');
-            mypage.classList.remove('hidden');
-            btn.innerText = 'もどる';
-        }
+        const isMain = !document.getElementById('main-view').classList.contains('hidden');
+        document.getElementById('main-view').classList.toggle('hidden');
+        document.getElementById('mypage-view').classList.toggle('hidden');
+        document.getElementById('nav-btn').innerText = isMain ? 'もどる' : 'マイページ';
     }
 
-    renderPosts();
+    render();
 </script>
-
 </body>
 </html>
