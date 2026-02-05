@@ -42,7 +42,6 @@
         .card { background-color: var(--card); border: 1px solid var(--border); border-radius: var(--radius-xl); margin-bottom: 2rem; overflow: hidden; }
         .card-inner { padding: 1.5rem; }
         
-        /* カードヘッダーの二段構成レイアウト */
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.2rem; }
         .card-header-main { display: flex; flex-direction: column; gap: 0.3rem; flex: 1; }
         .place-name-bold { font-family: var(--font-serif); font-weight: 600; font-size: 0.95rem; letter-spacing: 0.08rem; line-height: 1.4; }
@@ -168,6 +167,10 @@
         const SUPABASE_URL = 'https://ciklywhqswbujsogqiva.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpa2x5d2hxc3didWpzb2dxaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MzAyNzcsImV4cCI6MjA4NDUwNjI3N30._REwuc__qmpW1eQVhfm-RvsoMJCGYXjqtqBVn4w48Oc';
         
+        // 共通のタイル設定（Esri World Gray Canvas）
+        const TILE_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}';
+        const TILE_ATTRIB = 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ';
+
         let supabaseClient;
         let posts = [];
         let currentTab = 'my';
@@ -195,7 +198,7 @@
             toast.innerText = msg;
             toast.style.display = 'block';
             toast.classList.remove('toast-animation');
-            void toast.offsetWidth; // 強制リフロー
+            void toast.offsetWidth;
             toast.classList.add('toast-animation');
             setTimeout(() => { toast.style.display = 'none'; }, 3000);
         }
@@ -258,7 +261,6 @@
             const placeName = document.getElementById('place-name').value.trim();
             const content = document.getElementById('post-content').value.trim();
 
-            // 公開投稿時の必須チェック
             if (status === 'published') {
                 if (!penName || !placeName || !content) {
                     showToast("未入力の項目があります");
@@ -304,14 +306,12 @@
             const draftTab = document.getElementById('tab-draft');
             if (!topList) return;
 
-            // タイムライン表示（最新30件制限）
             const publicPosts = posts.filter(p => p.status === 'published').slice(0, 30);
             topList.innerHTML = publicPosts.length ? publicPosts.map(post => renderCard(post, 'top')).join('') : '<p style="font-size:0.8rem; color:#999; text-align:center; padding:2rem;">まだきき耳がありません</p>';
 
             if (mypageList) {
                 const myDrafts = posts.filter(p => p.user_id === userId && p.status === 'draft');
                 if (myDrafts.length > 0) draftTab.classList.add('has-drafts'); else draftTab.classList.remove('has-drafts');
-                
                 let filtered = [];
                 if (currentTab === 'my') filtered = posts.filter(p => p.user_id === userId && p.status === 'published');
                 if (currentTab === 'fav') {
@@ -319,7 +319,6 @@
                     filtered = posts.filter(p => favIds.includes(String(p.id)));
                 }
                 if (currentTab === 'draft') filtered = myDrafts;
-                
                 mypageList.innerHTML = filtered.length ? filtered.map(post => renderCard(post, 'my')).join('') : '<p style="font-size:0.8rem; color:#999; text-align:center; padding:2rem;">ここにはまだ何もありません</p>';
             }
         }
@@ -389,8 +388,8 @@
             if(!mapDiv) return;
             mapDiv.style.display = 'block';
             document.getElementById(`btn-map-${suffix}-${id}`).style.display = 'none';
-            const map = L.map(mapId).setView([lat, lng], 15);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
+            const map = L.map(mapId).setView([lat, lng], 16);
+            L.tileLayer(TILE_URL, { attribution: TILE_ATTRIB }).addTo(map);
             L.marker([lat, lng]).addTo(map);
             setTimeout(() => { map.invalidateSize(); }, 200);
         }
@@ -399,14 +398,14 @@
             document.getElementById('map-dialog').showModal();
             if (!selectorMap) {
                 selectorMap = L.map('map-selector').setView([35.6812, 139.7671], 15);
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(selectorMap);
+                L.tileLayer(TILE_URL, { attribution: TILE_ATTRIB }).addTo(selectorMap);
                 selectorMap.on('click', e => updateSelectorMarker(e.latlng));
             }
             document.getElementById('map-search-bar').style.display = (mode === 'search') ? 'flex' : 'none';
             if (mode === 'current' && navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(pos => {
                     const latlng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                    selectorMap.setView(latlng, 16); updateSelectorMarker(latlng);
+                    selectorMap.setView(latlng, 17); updateSelectorMarker(latlng);
                 });
             }
             setTimeout(() => { selectorMap.invalidateSize(); }, 300);
@@ -424,7 +423,7 @@
             const data = await res.json();
             if (data.length > 0) {
                 const latlng = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-                selectorMap.setView(latlng, 16); updateSelectorMarker(latlng);
+                selectorMap.setView(latlng, 17); updateSelectorMarker(latlng);
             }
         }
 
