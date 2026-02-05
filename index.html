@@ -160,9 +160,8 @@
     </main>
 
     <script>
-        // Supabase接続情報（ご自身のURLとAnonキーをここに入れてください）
-        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-        const SUPABASE_KEY = 'YOUR_SUPABASE_KEY';
+        const SUPABASE_URL = 'https://ciklywhqswbujsogqiva.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpa2x5d2hxc3didWpzb2dxaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MzAyNzcsImV4cCI6MjA4NDUwNjI3N30._REwuc__qmpW1eQVhfm-RvsoMJCGYXjqtqBVn4w48Oc';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let posts = [];
@@ -387,6 +386,8 @@
                     const latlng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
                     selectorMap.setView(latlng, 16);
                     updateSelectorMarker(latlng);
+                }, err => {
+                    alert("現在地を取得できませんでした。ブラウザの位置情報許可を確認してください。");
                 });
             }
             setTimeout(() => { selectorMap.invalidateSize(); }, 300);
