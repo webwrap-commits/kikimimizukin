@@ -23,7 +23,6 @@
         #top-view, #mypage-view { width: 100%; display: none; flex-direction: column; align-items: center; }
         #top-view.active, #mypage-view.active { display: flex; }
         #editor-container { width: 100%; display: none; flex-direction: column; align-items: center; }
-        #editor-container.active { display: flex; }
         .intro-card { background: white; border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 2.5rem 2rem; margin: 0 1.5rem 1rem; max-width: 42rem; box-sizing: border-box; }
         .intro-text { font-family: var(--font-sans); font-size: 0.9rem; color: #333; line-height: 2.5; letter-spacing: 0.05rem; white-space: pre-wrap; }
         .hero-img { width: 100%; max-width: 48rem; height: auto; margin-bottom: 2rem; padding: 0; box-sizing: border-box; }
@@ -141,23 +140,21 @@
     </main>
 
     <script>
+        // 設定値
         const SUPABASE_URL = 'https://ciklywhqswbujsogqiva.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpa2x5d2hxc3didWpzb2dxaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MzAyNzcsImV4cCI6MjA4NDUwNjI3N30._REwuc__qmpW1eQVhfm-RvsoMJCGYXjqtqBVn4w48Oc';
-        let supabase;
-        try {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        } catch(e) { console.error("Supabase初期化失敗", e); }
-
+        
+        // グローバル変数
+        let supabaseClient;
         let posts = [];
         let currentTab = 'my';
         let selectorMap, selectorMarker, selectedLatLng = null;
-        let postMaps = {};
         let editingDraftId = null;
         const bgm = document.getElementById('bgm');
-
         let userId = localStorage.getItem('kikimimi_user_id') || ('user_' + Math.random().toString(36).substr(2, 9));
         localStorage.setItem('kikimimi_user_id', userId);
 
+        // 関数定義
         function playAudio() {
             bgm.play().catch(e => console.log("再生失敗:", e));
             document.getElementById('audio-icon').innerText = 'volume_up';
@@ -171,7 +168,8 @@
         function toggleAudio() { if (bgm.paused) playAudio(); else pauseAudio(); }
 
         function showView(viewId) {
-            document.querySelectorAll('#top-view, #mypage-view').forEach(div => div.style.display = 'none');
+            document.getElementById('top-view').style.display = 'none';
+            document.getElementById('mypage-view').style.display = 'none';
             const target = document.getElementById(viewId);
             if(target) target.style.display = 'flex';
             
@@ -181,7 +179,6 @@
                 btnText.innerText = 'もどる';
                 btnIcon.innerText = 'arrow_back';
                 loadPosts();
-                switchTab('my');
             } else {
                 btnText.innerText = 'マイページ';
                 btnIcon.innerText = 'person';
@@ -203,20 +200,17 @@
         }
 
         async function loadPosts() {
-            if(!supabase) return;
             try {
-                const { data, error } = await supabase.from('kikimimi_posts').select('*').order('created_at', { ascending: false });
+                const { data, error } = await supabaseClient.from('kikimimi_posts').select('*').order('created_at', { ascending: false });
                 if (!error) posts = data;
                 renderPosts();
             } catch(e) { console.error("データ取得失敗", e); }
         }
 
         async function submitPost(status) {
-            if(!supabase) return;
             const penName = document.getElementById('pen-name').value;
             const placeName = document.getElementById('place-name').value;
             const content = document.getElementById('post-content').value;
-
             if (!selectedLatLng && !editingDraftId) { alert("場所を記録してください"); return; }
 
             const btn = (status === 'published') ? document.getElementById('btn-save') : document.getElementById('btn-draft');
@@ -236,10 +230,10 @@
             try {
                 let error;
                 if (editingDraftId) {
-                    const { error: err } = await supabase.from('kikimimi_posts').update(postData).eq('id', editingDraftId);
+                    const { error: err } = await supabaseClient.from('kikimimi_posts').update(postData).eq('id', editingDraftId);
                     error = err;
                 } else {
-                    const { error: err } = await supabase.from('kikimimi_posts').insert([postData]);
+                    const { error: err } = await supabaseClient.from('kikimimi_posts').insert([postData]);
                     error = err;
                 }
                 if (!error) {
@@ -261,8 +255,8 @@
 
             if (mypageList) {
                 let filtered = [];
-                if (currentTab === 'my') filtered = posts.filter(p => (p.user_id === userId || p.urer_id === userId) && p.status === 'published');
-                if (currentTab === 'draft') filtered = posts.filter(p => (p.user_id === userId || p.urer_id === userId) && p.status === 'draft');
+                if (currentTab === 'my') filtered = posts.filter(p => p.user_id === userId && p.status === 'published');
+                if (currentTab === 'draft') filtered = posts.filter(p => p.user_id === userId && p.status === 'draft');
                 if (currentTab === 'fav') {
                     const favIds = JSON.parse(localStorage.getItem('kikimimi_favs') || '[]');
                     filtered = posts.filter(p => favIds.includes(String(p.id)));
@@ -340,8 +334,7 @@
         }
 
         function openMapSelector(mode) {
-            const dialog = document.getElementById('map-dialog');
-            dialog.showModal();
+            document.getElementById('map-dialog').showModal();
             if (!selectorMap) {
                 selectorMap = L.map('map-selector').setView([35.6812, 139.7671], 15);
                 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(selectorMap);
@@ -379,9 +372,12 @@
         function openEditor() { document.getElementById('intro-card-area').style.display = 'none'; document.getElementById('action-btn-area').style.display = 'none'; document.getElementById('editor-container').style.display = 'flex'; if (bgm.paused) playAudio(); }
         function closeEditor() { document.getElementById('intro-card-area').style.display = 'block'; document.getElementById('action-btn-area').style.display = 'block'; document.getElementById('editor-container').style.display = 'none'; editingDraftId = null; document.getElementById('pen-name').value = ''; document.getElementById('place-name').value = ''; document.getElementById('post-content').value = ''; document.getElementById('selected-location').style.display = 'none'; selectedLatLng = null; }
 
-        // 初期化処理
+        // 初期化
         document.addEventListener('DOMContentLoaded', () => {
-            loadPosts();
+            try {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                loadPosts();
+            } catch(e) { console.error("初期化エラー", e); }
         });
     </script>
 </body>
