@@ -387,8 +387,8 @@
             if(!mapDiv) return;
             mapDiv.style.display = 'block';
             document.getElementById(`btn-map-${suffix}-${id}`).style.display = 'none';
-            // デフォルトズームを15に設定（美しさと実用性のバランス）
-            const map = L.map(mapId).setView([lat, lng], 15);
+            // デザインが綺麗に見えるズームレベル14に統一
+            const map = L.map(mapId).setView([lat, lng], 14);
             L.tileLayer(TILE_URL, { attribution: TILE_ATTRIB, maxZoom: 18 }).addTo(map);
             L.marker([lat, lng]).addTo(map);
             setTimeout(() => { map.invalidateSize(); }, 200);
@@ -397,7 +397,7 @@
         function openMapSelector(mode) {
             document.getElementById('map-dialog').showModal();
             if (!selectorMap) {
-                selectorMap = L.map('map-selector').setView([35.6812, 139.7671], 15);
+                selectorMap = L.map('map-selector').setView([35.6812, 139.7671], 14);
                 L.tileLayer(TILE_URL, { attribution: TILE_ATTRIB, maxZoom: 18 }).addTo(selectorMap);
                 selectorMap.on('click', e => updateSelectorMarker(e.latlng));
             }
@@ -405,7 +405,7 @@
             if (mode === 'current' && navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(pos => {
                     const latlng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                    selectorMap.setView(latlng, 15); updateSelectorMarker(latlng);
+                    selectorMap.setView(latlng, 14); updateSelectorMarker(latlng);
                 });
             }
             setTimeout(() => { selectorMap.invalidateSize(); }, 300);
@@ -423,7 +423,7 @@
             const data = await res.json();
             if (data.length > 0) {
                 const latlng = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-                selectorMap.setView(latlng, 15); updateSelectorMarker(latlng);
+                selectorMap.setView(latlng, 14); updateSelectorMarker(latlng);
             }
         }
 
