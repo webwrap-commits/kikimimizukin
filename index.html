@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>きき耳ずきん</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@200;300&family=Noto+Serif+JP:wght@200;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,200,0,0&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@200;300;400&family=Noto+Serif+JP:wght@200;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,200,0,0&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
@@ -30,18 +30,18 @@
         
         .editor-box { background: white; border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 1.5rem; width: 100%; max-width: 42rem; box-sizing: border-box; margin-bottom: 2rem; }
         .editor-wrapper { width: calc(100% - 3rem); margin: 0 1.5rem; display: flex; flex-direction: column; align-items: center; }
-        input[type="text"], textarea { width: 100%; padding: 0.8rem; border: 1px solid #eee; border-radius: 0.4rem; box-sizing: border-box; font-family: var(--font-sans); font-size: 0.9rem; margin-bottom: 1rem; background: #fafafa; }
+        input[type="text"], textarea { width: 100%; padding: 0.8rem; border: 1px solid #eee; border-radius: 0.4rem; box-sizing: border-box; font-family: var(--font-sans); font-size: 0.9rem; margin-bottom: 1rem; background: #fafafa; font-weight: 300; }
         textarea { height: 150px; resize: none; margin-bottom: 1.5rem; }
         
-        /* 修正箇所：綴るボタン（Noto Sans JP Light 300） */
-        .btn-submit { background: var(--foreground); color: white; padding: 1rem; border-radius: 3rem; width: 100%; border: none; cursor: pointer; font-family: var(--font-sans); font-weight: 300; font-size: 1rem; letter-spacing: 0.2rem; margin-top: 1rem; }
-        /* 修正箇所：下書きボタン（Noto Sans JP Light 300） */
-        .btn-draft { background: white; color: var(--foreground); border: 1px solid var(--foreground); padding: 0.8rem; border-radius: 3rem; width: 100%; cursor: pointer; font-family: var(--font-sans); font-weight: 300; font-size: 0.9rem; letter-spacing: 0.2rem; margin-top: 0.5rem; }
-        /* 修正箇所：やめるボタン（Noto Sans JP Light 300） */
-        .btn-cancel { text-align:center; padding:1.5rem 1rem 0; cursor:pointer; font-size:0.8rem; color:var(--muted-foreground); font-family: var(--font-sans); font-weight: 300; }
+        /* 綴るボタン：サイズを0.9remに統一、weightを300に固定 */
+        .btn-submit { background: var(--foreground); color: white; padding: 1rem; border-radius: 3rem; width: 100%; border: none; cursor: pointer; font-family: var(--font-sans) !important; font-weight: 300 !important; font-size: 0.9rem; letter-spacing: 0.2rem; margin-top: 1rem; }
+        /* 下書きボタン：綴るボタンと同じサイズと太さに設定 */
+        .btn-draft { background: white; color: var(--foreground); border: 1px solid var(--foreground); padding: 0.8rem; border-radius: 3rem; width: 100%; cursor: pointer; font-family: var(--font-sans) !important; font-weight: 300 !important; font-size: 0.9rem; letter-spacing: 0.2rem; margin-top: 0.5rem; }
+        /* やめる：weightを300に */
+        .btn-cancel { text-align:center; padding:1.5rem 1rem 0; cursor:pointer; font-size:0.8rem; color:var(--muted-foreground); font-family: var(--font-sans) !important; font-weight: 300 !important; }
         
         .pin-actions { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1.5rem; width: 100%; }
-        .pin-actions .btn-outline { width: 100%; padding: 0.8rem; box-sizing: border-box; }
+        .pin-actions .btn-outline { width: 100%; padding: 0.8rem; box-sizing: border-box; font-weight: 300; }
 
         #posts-list, #mypage-posts-list { width: 100%; max-width: 42rem; padding: 1rem 1.5rem 5rem; box-sizing: border-box; }
         .card { background-color: var(--card); border: 1px solid var(--border); border-radius: var(--radius-xl); margin-bottom: 2rem; overflow: hidden; }
@@ -49,8 +49,8 @@
         
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.2rem; }
         .card-header-main { display: flex; flex-direction: column; gap: 0.3rem; flex: 1; }
-        /* 修正箇所：場所の名前（Noto Sans JP Light 300） */
-        .place-name-bold { font-family: var(--font-sans); font-weight: 300; font-size: 0.95rem; letter-spacing: 0.08rem; line-height: 1.4; }
+        /* 場所の名前：Noto Sans JP 300 */
+        .place-name-bold { font-family: var(--font-sans) !important; font-weight: 300 !important; font-size: 0.95rem; letter-spacing: 0.08rem; line-height: 1.4; }
         .author-info-row { display: flex; align-items: center; gap: 0.8rem; font-size: 0.75rem; color: var(--muted-foreground); }
         
         .card-content { font-family: var(--font-sans); font-size: 0.9rem; line-height: 2; white-space: pre-wrap; color: #333; margin-bottom: 0.5rem; }
@@ -149,7 +149,7 @@
             <div class="mypage-tabs">
                 <button id="tab-my" class="tab-btn active" onclick="switchTab('my')">わたしのきき耳</button>
                 <button id="tab-fav" class="tab-btn" onclick="switchTab('fav')">気になるきき耳</button>
-                <button id="tab-draft" class="tab-btn" onclick="switchTab('draft')">下書き保存</button>
+                <button id="tab-draft" class="tab-btn" onclick="switchTab('draft') Button削除ボタン)">下書き保存</button>
             </div>
             <div id="mypage-posts-list"></div>
         </div>
