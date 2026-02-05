@@ -153,6 +153,7 @@
         let posts = [{ id: 1, penName: '旅人', placeName: '湊橋のたもと', content: '古い石碑に、かつてここが海の入り口だったと書いてありました。今はビルが立ち並んでいますが、目を閉じると波の音が聞こえてくるようです。', date: '2026/02/04', isFav: false, lat: 35.6812, lng: 139.7671 }];
         let currentTab = 'my';
         let selectorMap, selectorMarker, selectedLatLng = null;
+        let postMaps = {}; // 各カードの地図オブジェクトを保持
 
         function showView(viewId) {
             document.querySelectorAll('main > div').forEach(div => div.style.display = 'none');
@@ -193,8 +194,8 @@
 
         function renderPosts() {
             const containers = [
-                { el: document.getElementById('posts-list'), type: 'all', suffix: '' },
-                { el: document.getElementById('mypage-posts-list'), type: currentTab, suffix: 'mypage-' }
+                { el: document.getElementById('posts-list'), type: 'all', suffix: 'top' },
+                { el: document.getElementById('mypage-posts-list'), type: currentTab, suffix: 'my' }
             ];
 
             containers.forEach(c => {
@@ -215,26 +216,37 @@
                             <div class="card-content">${post.content}</div>
                         </div>
                         <div class="reply-section">
-                            <button id="btn-map-${c.suffix}${post.id}" class="btn-outline" onclick="showPostMap(${post.id}, ${post.lat}, ${post.lng}, '${c.suffix}')">
+                            <button id="btn-map-${c.suffix}-${post.id}" class="btn-outline" onclick="showPostMap(${post.id}, ${post.lat}, ${post.lng}, '${c.suffix}')">
                                 <span class="material-symbols-outlined" style="font-size: 1rem;">map</span>
                                 <span>地図を表示</span>
                             </button>
-                            <div id="map-${c.suffix}${post.id}" class="post-map"></div>
+                            <div id="map-${c.suffix}-${post.id}" class="post-map"></div>
                         </div>
                     </div>
                 `).join('');
             });
         }
 
-        function showPostMap(id, lat, lng, suffix = '') {
-            const mapDiv = document.getElementById(`map-${suffix}${id}`);
-            const btn = document.getElementById(`btn-map-${suffix}${id}`);
+        function showPostMap(id, lat, lng, suffix) {
+            const mapId = `map-${suffix}-${id}`;
+            const mapDiv = document.getElementById(mapId);
+            const btn = document.getElementById(`btn-map-${suffix}-${id}`);
             if (!mapDiv || !btn) return;
+
             mapDiv.style.display = 'block';
             btn.style.display = 'none';
-            const map = L.map(`map-${suffix}${id}`).setView([lat, lng], 15);
+
+            // もし既にそのIDで地図が存在していたら削除する（タブ切り替え対策）
+            if (postMaps[mapId]) {
+                postMaps[mapId].remove();
+            }
+
+            const map = L.map(mapId).setView([lat, lng], 15);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
             L.marker([lat, lng]).addTo(map);
+            
+            postMaps[mapId] = map; // 管理用オブジェクトに保存
+
             setTimeout(() => { map.invalidateSize(); }, 200);
         }
 
