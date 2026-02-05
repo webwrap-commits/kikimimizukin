@@ -27,7 +27,6 @@
         .intro-text { font-family: var(--font-sans); font-size: 0.9rem; color: #333; line-height: 2.5; letter-spacing: 0.05rem; white-space: pre-wrap; }
         .hero-img { width: 100%; max-width: 48rem; height: auto; margin-bottom: 2rem; padding: 0; box-sizing: border-box; }
         
-        /* フォーム周りの修正 */
         .editor-box { background: white; border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 1.5rem; width: 100%; max-width: 42rem; box-sizing: border-box; margin-bottom: 2rem; }
         .editor-wrapper { width: calc(100% - 3rem); margin: 0 1.5rem; display: flex; flex-direction: column; align-items: center; }
         input[type="text"], textarea { width: 100%; padding: 0.8rem; border: 1px solid #eee; border-radius: 0.4rem; box-sizing: border-box; font-family: var(--font-sans); font-size: 0.9rem; margin-bottom: 1rem; background: #fafafa; }
@@ -36,7 +35,6 @@
         .btn-submit { background: var(--foreground); color: white; padding: 1rem; border-radius: 3rem; width: 100%; border: none; cursor: pointer; font-family: var(--font-serif); font-size: 1rem; letter-spacing: 0.2rem; margin-top: 1rem; }
         .btn-draft { background: white; color: var(--foreground); border: 1px solid var(--foreground); padding: 0.8rem; border-radius: 3rem; width: 100%; cursor: pointer; font-family: var(--font-serif); font-size: 0.9rem; letter-spacing: 0.2rem; margin-top: 0.5rem; }
         
-        /* ピン留めボタン縦並び */
         .pin-actions { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1.5rem; width: 100%; }
         .pin-actions .btn-outline { width: 100%; padding: 0.8rem; box-sizing: border-box; }
 
@@ -51,15 +49,18 @@
         .post-map { width: 100%; height: 200px; border-radius: 0.5rem; display: none; margin-top: 0.5rem; border: 1px solid var(--border); }
         .save-btn { background: none; border: none; cursor: pointer; color: var(--muted-foreground); display: flex; align-items: center; padding: 0; }
         .save-btn.active { color: var(--accent-color); font-variation-settings: 'FILL' 1; }
-        .mypage-tabs { display: flex; justify-content: center; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border); width: 100%; max-width: 42rem; }
-        .tab-btn { background: none; border: none; padding: 1rem 0.5rem; cursor: pointer; font-size: 0.8rem; color: var(--muted-foreground); }
+        
+        /* マイページタブ修正 */
+        .mypage-tabs { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border); width: 100%; max-width: 42rem; }
+        .tab-btn { background: none; border: none; padding: 1rem 0.5rem; cursor: pointer; font-size: 0.75rem; color: var(--muted-foreground); white-space: nowrap; }
         .tab-btn.active { color: var(--foreground); border-bottom: 2px solid var(--foreground); }
+        .tab-btn.has-drafts { color: var(--accent-color); }
+        
         .section-title { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 200; letter-spacing: 0.3rem; margin: 2rem 0 1rem; width: 100%; text-align: center; }
         dialog { border: none; border-radius: var(--radius-xl); padding: 0; width: 95%; max-width: 40rem; }
         dialog::backdrop { background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(2px); }
         #map-selector { width: 100%; height: 350px; background: #eee; }
         .draft-badge { background: #eee; color: #666; font-size: 0.6rem; padding: 0.2rem 0.4rem; border-radius: 0.2rem; margin-right: 0.5rem; vertical-align: middle; }
-        .draft-time { font-size: 0.7rem; color: var(--muted-foreground); display: block; margin-top: 0.2rem; }
     </style>
 </head>
 <body>
@@ -117,8 +118,8 @@
                     </div>
 
                     <button id="btn-save" class="btn-submit" onclick="submitPost('published')">きき耳したことを綴る</button>
-                    <button id="btn-draft" class="btn-draft" onclick="handleDraftSave()">場所だけ下書き保存</button>
-                    <div onclick="closeEditor()" style="text-align:center; padding:1.5rem 1rem 0; cursor:pointer; font-size:0.8rem; color:var(--muted-foreground);">キャンセル</div>
+                    <button id="btn-draft" class="btn-draft" onclick="handleDraftSave()">現在地を下書き保存</button>
+                    <div onclick="closeEditor()" style="text-align:center; padding:1.5rem 1rem 0; cursor:pointer; font-size:0.8rem; color:var(--muted-foreground);">やめる</div>
                 </div>
             </div>
 
@@ -130,8 +131,8 @@
             <h2 style="font-family: var(--font-serif); font-weight: 200; margin: 2rem 0; text-align:center;">私のきき耳ずきん</h2>
             <div class="mypage-tabs">
                 <button id="tab-my" class="tab-btn active" onclick="switchTab('my')">わたしのきき耳</button>
-                <button id="tab-draft" class="tab-btn" onclick="switchTab('draft')">きき耳の種</button>
                 <button id="tab-fav" class="tab-btn" onclick="switchTab('fav')">気になるきき耳</button>
+                <button id="tab-draft" class="tab-btn" onclick="switchTab('draft')">下書き保存</button>
             </div>
             <div id="mypage-posts-list"></div>
         </div>
@@ -165,6 +166,7 @@
         let userId = localStorage.getItem('kikimimi_user_id') || ('user_' + Math.random().toString(36).substr(2, 9));
         localStorage.setItem('kikimimi_user_id', userId);
 
+        // --- 音の制御 ---
         function playAudio() {
             bgm.play().catch(e => console.log("再生失敗:", e));
             document.getElementById('audio-icon').innerText = 'volume_up';
@@ -177,6 +179,14 @@
         }
         function toggleAudio() { if (bgm.paused) playAudio(); else pauseAudio(); }
 
+        // ブラウザを閉じたりバックグラウンドに回った時に音を止める
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                pauseAudio();
+            }
+        });
+
+        // --- ビュー制御 ---
         function showView(viewId) {
             document.getElementById('top-view').style.display = 'none';
             document.getElementById('mypage-view').style.display = 'none';
@@ -209,6 +219,7 @@
             renderPosts();
         }
 
+        // --- データ処理 ---
         async function loadPosts() {
             try {
                 const { data, error } = await supabaseClient.from('kikimimi_posts').select('*').order('created_at', { ascending: false });
@@ -218,24 +229,24 @@
         }
 
         async function handleDraftSave() {
-            // 場所が未設定ならGPS取得してから保存
+            const btn = document.getElementById('btn-draft');
             if (!selectedLatLng && !editingDraftId) {
                 if (navigator.geolocation) {
-                    const btn = document.getElementById('btn-draft');
                     btn.disabled = true;
                     btn.innerText = "現在地を取得中...";
-                    
                     navigator.geolocation.getCurrentPosition(async (pos) => {
                         selectedLatLng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
                         document.getElementById('selected-location').style.display = 'flex';
                         await submitPost('draft');
-                    }, (err) => {
-                        alert("現在地が取得できませんでした。ピン留めボタンから場所を選んでください。");
                         btn.disabled = false;
-                        btn.innerText = "場所だけ下書き保存";
+                        btn.innerText = "現在地を下書き保存";
+                    }, (err) => {
+                        alert("現在地が取得できませんでした。ピン留めから場所を選んでください。");
+                        btn.disabled = false;
+                        btn.innerText = "現在地を下書き保存";
                     });
                 } else {
-                    alert("お使いのブラウザではGPSが利用できません。");
+                    alert("GPSが利用できません。");
                 }
             } else {
                 await submitPost('draft');
@@ -248,7 +259,7 @@
             const content = document.getElementById('post-content').value;
 
             const btn = (status === 'published') ? document.getElementById('btn-save') : document.getElementById('btn-draft');
-            const originalText = btn.innerText;
+            const originalText = (status === 'published') ? "きき耳したことを綴る" : "現在地を下書き保存";
             btn.disabled = true; btn.innerText = "預かり中...";
 
             const postData = {
@@ -273,7 +284,6 @@
                 if (!error) {
                     closeEditor();
                     await loadPosts();
-                    if (status === 'draft') alert("場所を種として保存しました。");
                 } else { alert("保存に失敗しました"); }
             } catch(e) { alert("通信エラーが発生しました"); }
             btn.disabled = false; btn.innerText = originalText;
@@ -282,19 +292,27 @@
         function renderPosts() {
             const topList = document.getElementById('posts-list');
             const mypageList = document.getElementById('mypage-posts-list');
+            const draftTab = document.getElementById('tab-draft');
             if (!topList) return;
 
             const publicPosts = posts.filter(p => p.status === 'published');
             topList.innerHTML = publicPosts.length ? publicPosts.map(post => renderCard(post, 'top')).join('') : '<p style="font-size:0.8rem; color:#999; text-align:center; padding:2rem;">まだきき耳がありません</p>';
 
             if (mypageList) {
+                const myDrafts = posts.filter(p => p.user_id === userId && p.status === 'draft');
+                
+                // 下書きがある場合は朱色にする
+                if (myDrafts.length > 0) draftTab.classList.add('has-drafts');
+                else draftTab.classList.remove('has-drafts');
+
                 let filtered = [];
                 if (currentTab === 'my') filtered = posts.filter(p => p.user_id === userId && p.status === 'published');
-                if (currentTab === 'draft') filtered = posts.filter(p => p.user_id === userId && p.status === 'draft');
                 if (currentTab === 'fav') {
                     const favIds = JSON.parse(localStorage.getItem('kikimimi_favs') || '[]');
                     filtered = posts.filter(p => favIds.includes(String(p.id)));
                 }
+                if (currentTab === 'draft') filtered = myDrafts;
+                
                 mypageList.innerHTML = filtered.length ? filtered.map(post => renderCard(post, 'my')).join('') : '<p style="font-size:0.8rem; color:#999; text-align:center; padding:2rem;">ここにはまだ何もありません</p>';
             }
         }
@@ -310,7 +328,7 @@
                     <div class="card-inner">
                         <div class="card-header">
                             <div>
-                                ${isDraft ? '<span class="draft-badge">種</span>' : ''}
+                                ${isDraft ? '<span class="draft-badge">下書き</span>' : ''}
                                 <span class="place-name-bold">${post.place_name}</span>
                                 <span class="author-label">@${post.pen_name || '...'}</span>
                             </div>
@@ -330,6 +348,7 @@
                 </div>`;
         }
 
+        // --- 編集・削除・マップ等 ---
         function editDraft(id) {
             const draft = posts.find(p => p.id === id);
             if (!draft) return;
@@ -400,11 +419,13 @@
         }
 
         function confirmLocation() { if (selectedLatLng) { document.getElementById('selected-location').style.display = 'flex'; document.getElementById('map-dialog').close(); } }
-        function openEditor() { document.getElementById('intro-card-area').style.display = 'none'; document.getElementById('action-btn-area').style.display = 'none'; document.getElementById('editor-container').style.display = 'flex'; if (bgm.paused) playAudio(); }
+        function openEditor() { document.getElementById('intro-card-area').style.display = 'none'; document.getElementById('action-btn-area').style.display = 'none'; document.getElementById('editor-container').style.display = 'flex'; }
         function closeEditor() { document.getElementById('intro-card-area').style.display = 'block'; document.getElementById('action-btn-area').style.display = 'block'; document.getElementById('editor-container').style.display = 'none'; editingDraftId = null; document.getElementById('pen-name').value = ''; document.getElementById('place-name').value = ''; document.getElementById('post-content').value = ''; document.getElementById('selected-location').style.display = 'none'; selectedLatLng = null; }
 
         document.addEventListener('DOMContentLoaded', () => {
             try {
+                // 音は停止・ミュート状態から
+                pauseAudio();
                 supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
                 loadPosts();
             } catch(e) { console.error("初期化エラー", e); }
