@@ -387,9 +387,15 @@
             if(!mapDiv) return;
             mapDiv.style.display = 'block';
             document.getElementById(`btn-map-${suffix}-${id}`).style.display = 'none';
-            // デザインが綺麗に見えるズームレベル14に統一
+            
             const map = L.map(mapId).setView([lat, lng], 14);
-            L.tileLayer(TILE_URL, { attribution: TILE_ATTRIB, maxZoom: 18 }).addTo(map);
+            // detectRetina: true を追加してiPhoneでの表示を鮮明にする
+            L.tileLayer(TILE_URL, { 
+                attribution: TILE_ATTRIB, 
+                maxZoom: 18,
+                detectRetina: true 
+            }).addTo(map);
+            
             L.marker([lat, lng]).addTo(map);
             setTimeout(() => { map.invalidateSize(); }, 200);
         }
@@ -398,7 +404,11 @@
             document.getElementById('map-dialog').showModal();
             if (!selectorMap) {
                 selectorMap = L.map('map-selector').setView([35.6812, 139.7671], 14);
-                L.tileLayer(TILE_URL, { attribution: TILE_ATTRIB, maxZoom: 18 }).addTo(selectorMap);
+                L.tileLayer(TILE_URL, { 
+                    attribution: TILE_ATTRIB, 
+                    maxZoom: 18,
+                    detectRetina: true 
+                }).addTo(selectorMap);
                 selectorMap.on('click', e => updateSelectorMarker(e.latlng));
             }
             document.getElementById('map-search-bar').style.display = (mode === 'search') ? 'flex' : 'none';
