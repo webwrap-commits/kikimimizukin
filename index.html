@@ -167,7 +167,6 @@
         const SUPABASE_URL = 'https://ciklywhqswbujsogqiva.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpa2x5d2hxc3didWpzb2dxaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MzAyNzcsImV4cCI6MjA4NDUwNjI3N30._REwuc__qmpW1eQVhfm-RvsoMJCGYXjqtqBVn4w48Oc';
         
-        // 日本の地理院タイル（淡色）
         const TILE_URL = 'https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png';
         const TILE_ATTRIB = '&copy; <a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院</a>';
 
@@ -316,7 +315,6 @@
                 if (currentTab === 'my') filtered = posts.filter(p => p.user_id === userId && p.status === 'published');
                 if (currentTab === 'fav') {
                     const favIds = JSON.parse(localStorage.getItem('kikimimi_favs') || '[]');
-                    filtered = posts.filter(favIds.includes(String(p.id))); // 修正箇所：filterの書き方
                     filtered = posts.filter(p => favIds.includes(String(p.id)));
                 }
                 if (currentTab === 'draft') filtered = myDrafts;
@@ -389,7 +387,8 @@
             if(!mapDiv) return;
             mapDiv.style.display = 'block';
             document.getElementById(`btn-map-${suffix}-${id}`).style.display = 'none';
-            const map = L.map(mapId).setView([lat, lng], 17);
+            // デフォルトズームを15に設定（美しさと実用性のバランス）
+            const map = L.map(mapId).setView([lat, lng], 15);
             L.tileLayer(TILE_URL, { attribution: TILE_ATTRIB, maxZoom: 18 }).addTo(map);
             L.marker([lat, lng]).addTo(map);
             setTimeout(() => { map.invalidateSize(); }, 200);
@@ -406,7 +405,7 @@
             if (mode === 'current' && navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(pos => {
                     const latlng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                    selectorMap.setView(latlng, 17); updateSelectorMarker(latlng);
+                    selectorMap.setView(latlng, 15); updateSelectorMarker(latlng);
                 });
             }
             setTimeout(() => { selectorMap.invalidateSize(); }, 300);
@@ -424,7 +423,7 @@
             const data = await res.json();
             if (data.length > 0) {
                 const latlng = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-                selectorMap.setView(latlng, 17); updateSelectorMarker(latlng);
+                selectorMap.setView(latlng, 15); updateSelectorMarker(latlng);
             }
         }
 
