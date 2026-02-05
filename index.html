@@ -134,9 +134,13 @@
         </div>
 
         <dialog id="map-dialog">
-            <div style="padding: 1rem; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border);">
+            <div style="padding: 1rem; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); align-items: center;">
                 <span style="font-size:0.9rem;">場所をピン留め</span>
                 <button onclick="document.getElementById('map-dialog').close()" style="background:none; border:none; cursor:pointer;"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            <div id="map-search-bar" style="padding: 0.8rem; display: flex; gap: 0.5rem; background: #f9f9f9; border-bottom: 1px solid var(--border);">
+                <input type="text" id="map-search-input" placeholder="場所の名前で検索" style="margin-bottom: 0; flex: 1; padding: 0.5rem;">
+                <button class="btn-outline" onclick="searchLocation()" style="padding: 0.5rem 1rem;">検索</button>
             </div>
             <div id="map-selector"></div>
             <div style="padding:1rem; text-align:center;">
@@ -241,23 +245,52 @@
                 selectorMap = L.map('map-selector').setView([35.6812, 139.7671], 15);
                 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(selectorMap);
                 selectorMap.on('click', e => {
-                    if (selectorMarker) selectorMap.removeLayer(selectorMarker);
-                    selectorMarker = L.marker(e.latlng).addTo(selectorMap);
-                    selectedLatLng = e.latlng;
+                    updateSelectorMarker(e.latlng);
                 });
             }
+
+            // 検索バーを表示するかどうかの制御
+            document.getElementById('map-search-bar').style.display = (mode === 'search') ? 'flex' : 'none';
+
             if (mode === 'current' && navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(pos => {
                     const latlng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
                     selectorMap.setView(latlng, 16);
-                    if (selectorMarker) selectorMap.removeLayer(selectorMarker);
-                    selectorMarker = L.marker(latlng).addTo(selectorMap);
-                    selectedLatLng = latlng;
+                    updateSelectorMarker(latlng);
                 }, (err) => {
                     console.log("位置情報が取得できませんでした");
                 });
             }
             setTimeout(() => { selectorMap.invalidateSize(); }, 300);
+        }
+
+        // マーカーと座標を更新する共通処理
+        function updateSelectorMarker(latlng) {
+            if (selectorMarker) selectorMap.removeLayer(selectorMarker);
+            selectorMarker = L.marker(latlng).addTo(selectorMap);
+            selectedLatLng = latlng;
+        }
+
+        // Nominatimを使った場所検索機能
+        async function searchLocation() {
+            const query = document.getElementById('map-search-input').value;
+            if (!query) return;
+            
+            try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                
+                if (data && data.length > 0) {
+                    const latlng = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+                    selectorMap.setView(latlng, 16);
+                    updateSelectorMarker(latlng);
+                } else {
+                    alert('場所が見つかりませんでした');
+                }
+            } catch (error) {
+                console.error('検索エラー:', error);
+                alert('検索中にエラーが発生しました');
+            }
         }
 
         function confirmLocation() {
