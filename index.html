@@ -17,34 +17,21 @@
         body { font-family: var(--font-sans); background-color: var(--background); color: var(--foreground); margin: 0; padding: 0; line-height: 1.8; display: flex; flex-direction: column; align-items: center; font-weight: 200; -webkit-text-size-adjust: 100%; }
         header { width: 100%; max-width: 48rem; padding: 4rem 1.5rem 1rem; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; }
         h1 { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 200; letter-spacing: 0.3rem; margin: 0; cursor: pointer; }
-        
-        .btn-outline { 
-            display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; 
-            padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.75rem; 
-            border: 1px solid var(--border); background: white; cursor: pointer; 
-            color: var(--foreground); transition: opacity 0.3s;
-        }
-
+        .btn-outline { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.75rem; border: 1px solid var(--border); background: white; cursor: pointer; color: var(--foreground); transition: opacity 0.3s; }
         main { width: 100%; max-width: 48rem; display: flex; flex-direction: column; align-items: center; }
         .audio-control-btn { position: sticky; top: 1rem; margin-left: auto; margin-right: 1.5rem; margin-bottom: 1rem; z-index: 100; background: rgba(255,255,255,0.8); backdrop-filter: blur(4px); border: 1px solid var(--border); border-radius: 2rem; padding: 0.4rem 1rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.65rem; color: var(--muted-foreground); cursor: pointer; }
-        
         #top-view, #mypage-view { width: 100%; display: none; flex-direction: column; align-items: center; }
         #top-view.active, #mypage-view.active { display: flex; }
-
         #editor-container { width: 100%; display: none; flex-direction: column; align-items: center; }
         #editor-container.active { display: flex; }
-
         .intro-card { background: white; border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 2.5rem 2rem; margin: 0 1.5rem 1rem; max-width: 42rem; box-sizing: border-box; }
         .intro-text { font-family: var(--font-sans); font-size: 0.9rem; color: #333; line-height: 2.5; letter-spacing: 0.05rem; white-space: pre-wrap; }
         .hero-img { width: 100%; max-width: 48rem; height: auto; margin-bottom: 2rem; padding: 0; box-sizing: border-box; }
-
         .editor-box { background: white; border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 2rem; width: calc(100% - 3rem); max-width: 42rem; box-sizing: border-box; margin: 0 1.5rem 2rem; }
         input[type="text"], textarea { width: 100%; padding: 0.8rem; border: 1px solid #eee; border-radius: 0.4rem; box-sizing: border-box; font-family: var(--font-sans); font-size: 0.9rem; margin-bottom: 1rem; background: #fafafa; }
         textarea { height: 150px; resize: none; margin-bottom: 1.5rem; }
-        
         .btn-submit { background: var(--foreground); color: white; padding: 1rem; border-radius: 3rem; width: 100%; border: none; cursor: pointer; font-family: var(--font-serif); font-size: 1rem; letter-spacing: 0.2rem; margin-top: 1rem; }
         .btn-draft { background: white; color: var(--foreground); border: 1px solid var(--foreground); padding: 0.8rem; border-radius: 3rem; width: 100%; cursor: pointer; font-family: var(--font-serif); font-size: 0.9rem; margin-top: 0.5rem; }
-
         #posts-list, #mypage-posts-list { width: 100%; max-width: 42rem; padding: 1rem 1.5rem 5rem; box-sizing: border-box; }
         .card { background-color: var(--card); border: 1px solid var(--border); border-radius: var(--radius-xl); margin-bottom: 2rem; overflow: hidden; }
         .card-inner { padding: 1.5rem; }
@@ -52,23 +39,17 @@
         .place-name-bold { font-family: var(--font-serif); font-weight: 600; font-size: 0.95rem; }
         .author-label { font-size: 0.75rem; color: var(--muted-foreground); margin-left: 0.5rem; }
         .card-content { font-family: var(--font-sans); font-size: 0.9rem; line-height: 2; white-space: pre-wrap; color: #333; margin-bottom: 0.5rem; }
-        
         .reply-section { background-color: var(--reply-bg); padding: 1rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 1rem; }
         .post-map { width: 100%; height: 200px; border-radius: 0.5rem; display: none; margin-top: 0.5rem; border: 1px solid var(--border); }
-
         .save-btn { background: none; border: none; cursor: pointer; color: var(--muted-foreground); display: flex; align-items: center; padding: 0; }
         .save-btn.active { color: var(--accent-color); font-variation-settings: 'FILL' 1; }
-
         .mypage-tabs { display: flex; justify-content: center; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border); width: 100%; max-width: 42rem; }
         .tab-btn { background: none; border: none; padding: 1rem 0.5rem; cursor: pointer; font-size: 0.8rem; color: var(--muted-foreground); }
         .tab-btn.active { color: var(--foreground); border-bottom: 2px solid var(--foreground); }
-
         .section-title { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 200; letter-spacing: 0.3rem; margin: 2rem 0 1rem; width: 100%; text-align: center; }
-
         dialog { border: none; border-radius: var(--radius-xl); padding: 0; width: 95%; max-width: 40rem; }
         dialog::backdrop { background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(2px); }
         #map-selector { width: 100%; height: 350px; background: #eee; }
-
         .draft-badge { background: #eee; color: #666; font-size: 0.6rem; padding: 0.2rem 0.4rem; border-radius: 0.2rem; margin-right: 0.5rem; vertical-align: middle; }
         .draft-time { font-size: 0.7rem; color: var(--muted-foreground); display: block; margin-top: 0.2rem; }
     </style>
@@ -162,7 +143,10 @@
     <script>
         const SUPABASE_URL = 'https://ciklywhqswbujsogqiva.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpa2x5d2hxc3didWpzb2dxaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MzAyNzcsImV4cCI6MjA4NDUwNjI3N30._REwuc__qmpW1eQVhfm-RvsoMJCGYXjqtqBVn4w48Oc';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let supabase;
+        try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        } catch(e) { console.error("Supabase初期化失敗", e); }
 
         let posts = [];
         let currentTab = 'my';
@@ -171,11 +155,8 @@
         let editingDraftId = null;
         const bgm = document.getElementById('bgm');
 
-        let userId = localStorage.getItem('kikimimi_user_id');
-        if (!userId) {
-            userId = 'user_' + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('kikimimi_user_id', userId);
-        }
+        let userId = localStorage.getItem('kikimimi_user_id') || ('user_' + Math.random().toString(36).substr(2, 9));
+        localStorage.setItem('kikimimi_user_id', userId);
 
         function playAudio() {
             bgm.play().catch(e => console.log("再生失敗:", e));
@@ -187,63 +168,60 @@
             document.getElementById('audio-icon').innerText = 'volume_off';
             document.getElementById('audio-text').innerText = '静寂の中';
         }
-        function toggleAudio() { if (bgm.paused) { playAudio(); } else { pauseAudio(); } }
+        function toggleAudio() { if (bgm.paused) playAudio(); else pauseAudio(); }
 
-        async function showView(viewId) {
-            document.querySelectorAll('main > div').forEach(div => div.style.display = 'none');
-            document.getElementById(viewId).style.display = 'flex';
-            const headerBtnText = document.getElementById('header-btn-text');
-            const headerBtnIcon = document.getElementById('header-btn-icon');
+        function showView(viewId) {
+            document.querySelectorAll('#top-view, #mypage-view').forEach(div => div.style.display = 'none');
+            const target = document.getElementById(viewId);
+            if(target) target.style.display = 'flex';
+            
+            const btnText = document.getElementById('header-btn-text');
+            const btnIcon = document.getElementById('header-btn-icon');
             if (viewId === 'mypage-view') {
-                headerBtnText.innerText = 'もどる';
-                headerBtnIcon.innerText = 'arrow_back';
-                await loadPosts();
+                btnText.innerText = 'もどる';
+                btnIcon.innerText = 'arrow_back';
+                loadPosts();
                 switchTab('my');
             } else {
-                headerBtnText.innerText = 'マイページ';
-                headerBtnIcon.innerText = 'person';
-                await loadPosts();
+                btnText.innerText = 'マイページ';
+                btnIcon.innerText = 'person';
+                loadPosts();
             }
         }
 
         function toggleMypage() {
-            if (document.getElementById('mypage-view').style.display === 'flex') {
-                showView('top-view');
-            } else {
-                showView('mypage-view');
-            }
+            if (document.getElementById('mypage-view').style.display === 'flex') showView('top-view');
+            else showView('mypage-view');
         }
 
         function switchTab(tab) {
             currentTab = tab;
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`tab-${tab}`).classList.add('active');
+            const tabBtn = document.getElementById(`tab-${tab}`);
+            if(tabBtn) tabBtn.classList.add('active');
             renderPosts();
         }
 
         async function loadPosts() {
-            const { data, error } = await supabase
-                .from('kikimimi_posts')
-                .select('*')
-                .order('created_at', { ascending: false });
-            if (!error) posts = data;
-            renderPosts();
+            if(!supabase) return;
+            try {
+                const { data, error } = await supabase.from('kikimimi_posts').select('*').order('created_at', { ascending: false });
+                if (!error) posts = data;
+                renderPosts();
+            } catch(e) { console.error("データ取得失敗", e); }
         }
 
         async function submitPost(status) {
+            if(!supabase) return;
             const penName = document.getElementById('pen-name').value;
             const placeName = document.getElementById('place-name').value;
             const content = document.getElementById('post-content').value;
 
-            if (!selectedLatLng && !editingDraftId) {
-                alert("場所を記録してください");
-                return;
-            }
+            if (!selectedLatLng && !editingDraftId) { alert("場所を記録してください"); return; }
 
             const btn = (status === 'published') ? document.getElementById('btn-save') : document.getElementById('btn-draft');
             const originalText = btn.innerText;
-            btn.disabled = true;
-            btn.innerText = "預かり中...";
+            btn.disabled = true; btn.innerText = "預かり中...";
 
             const postData = {
                 pen_name: penName || (status === 'published' ? 'ななし' : ''),
@@ -255,24 +233,22 @@
                 user_id: userId
             };
 
-            let error;
-            if (editingDraftId) {
-                const { error: err } = await supabase.from('kikimimi_posts').update(postData).eq('id', editingDraftId);
-                error = err;
-            } else {
-                const { error: err } = await supabase.from('kikimimi_posts').insert([postData]);
-                error = err;
-            }
-
-            if (!error) {
-                closeEditor();
-                await loadPosts();
-                if (status === 'draft') alert("場所を種として保存しました。マイページからいつでも綴れます。");
-            } else {
-                alert("エラーが発生しました");
-            }
-            btn.disabled = false;
-            btn.innerText = originalText;
+            try {
+                let error;
+                if (editingDraftId) {
+                    const { error: err } = await supabase.from('kikimimi_posts').update(postData).eq('id', editingDraftId);
+                    error = err;
+                } else {
+                    const { error: err } = await supabase.from('kikimimi_posts').insert([postData]);
+                    error = err;
+                }
+                if (!error) {
+                    closeEditor();
+                    await loadPosts();
+                    if (status === 'draft') alert("場所を種として保存しました。");
+                } else { alert("保存に失敗しました"); }
+            } catch(e) { alert("通信エラーが発生しました"); }
+            btn.disabled = false; btn.innerText = originalText;
         }
 
         function renderPosts() {
@@ -281,17 +257,17 @@
             if (!topList) return;
 
             const publicPosts = posts.filter(p => p.status === 'published');
-            topList.innerHTML = publicPosts.map(post => renderCard(post, 'top')).join('');
+            topList.innerHTML = publicPosts.length ? publicPosts.map(post => renderCard(post, 'top')).join('') : '<p style="font-size:0.8rem; color:#999; text-align:center; padding:2rem;">まだきき耳がありません</p>';
 
             if (mypageList) {
                 let filtered = [];
-                if (currentTab === 'my') filtered = posts.filter(p => p.user_id === userId && p.status === 'published');
-                if (currentTab === 'draft') filtered = posts.filter(p => p.user_id === userId && p.status === 'draft');
+                if (currentTab === 'my') filtered = posts.filter(p => (p.user_id === userId || p.urer_id === userId) && p.status === 'published');
+                if (currentTab === 'draft') filtered = posts.filter(p => (p.user_id === userId || p.urer_id === userId) && p.status === 'draft');
                 if (currentTab === 'fav') {
                     const favIds = JSON.parse(localStorage.getItem('kikimimi_favs') || '[]');
                     filtered = posts.filter(p => favIds.includes(String(p.id)));
                 }
-                mypageList.innerHTML = filtered.map(post => renderCard(post, 'my')).join('');
+                mypageList.innerHTML = filtered.length ? filtered.map(post => renderCard(post, 'my')).join('') : '<p style="font-size:0.8rem; color:#999; text-align:center; padding:2rem;">ここにはまだ何もありません</p>';
             }
         }
 
@@ -314,29 +290,18 @@
                             </div>
                             <div style="display: flex; align-items: center; gap: 0.8rem;">
                                 ${!isDraft ? `<span style="font-size:0.65rem; color:#999;">${dateStr}</span>` : ''}
-                                ${!isDraft ? `
-                                    <button class="save-btn ${isFav ? 'active' : ''}" onclick="toggleFav('${post.id}')">
-                                        <span class="material-symbols-outlined" style="font-size: 1.2rem;">bookmark</span>
-                                    </button>` : ''}
+                                ${!isDraft ? `<button class="save-btn ${isFav ? 'active' : ''}" onclick="toggleFav('${post.id}')"><span class="material-symbols-outlined" style="font-size: 1.2rem;">bookmark</span></button>` : ''}
                             </div>
                         </div>
-                        <div class="card-content">${post.content || (isDraft ? '（まだ言葉が綴られていません）' : '')}</div>
+                        <div class="card-content">${post.content || (isDraft ? '（言葉はまだ綴られていません）' : '')}</div>
                     </div>
                     <div class="reply-section">
-                        ${isDraft ? `
-                            <button class="btn-outline" onclick="editDraft(${post.id})">
-                                <span class="material-symbols-outlined" style="font-size: 1rem;">edit</span>
-                                <span>言葉を綴る</span>
-                            </button>` : `
-                            <button id="btn-map-${suffix}-${post.id}" class="btn-outline" onclick="showPostMap(${post.id}, ${post.lat}, ${post.lng}, '${suffix}')">
-                                <span class="material-symbols-outlined" style="font-size: 1rem;">map</span>
-                                <span>場所を確認</span>
-                            </button>
+                        ${isDraft ? `<button class="btn-outline" onclick="editDraft(${post.id})"><span class="material-symbols-outlined" style="font-size: 1rem;">edit</span><span>言葉を綴る</span></button>` : `
+                            <button id="btn-map-${suffix}-${post.id}" class="btn-outline" onclick="showPostMap(${post.id}, ${post.lat}, ${post.lng}, '${suffix}')"><span class="material-symbols-outlined" style="font-size: 1rem;">map</span><span>場所を確認</span></button>
                             <div id="map-${suffix}-${post.id}" class="post-map"></div>
                         `}
                     </div>
-                </div>
-            `;
+                </div>`;
         }
 
         function editDraft(id) {
@@ -357,14 +322,16 @@
         function toggleFav(id) {
             let favs = JSON.parse(localStorage.getItem('kikimimi_favs') || '[]');
             id = String(id);
-            if (favs.includes(id)) { favs = favs.filter(f => f !== id); } else { favs.push(id); }
+            if (favs.includes(id)) favs = favs.filter(f => f !== id); else favs.push(id);
             localStorage.setItem('kikimimi_favs', JSON.stringify(favs));
             renderPosts();
         }
 
         function showPostMap(id, lat, lng, suffix) {
             const mapId = `map-${suffix}-${id}`;
-            document.getElementById(mapId).style.display = 'block';
+            const mapDiv = document.getElementById(mapId);
+            if(!mapDiv) return;
+            mapDiv.style.display = 'block';
             document.getElementById(`btn-map-${suffix}-${id}`).style.display = 'none';
             const map = L.map(mapId).setView([lat, lng], 15);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
@@ -386,8 +353,6 @@
                     const latlng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
                     selectorMap.setView(latlng, 16);
                     updateSelectorMarker(latlng);
-                }, err => {
-                    alert("現在地を取得できませんでした。ブラウザの位置情報許可を確認してください。");
                 });
             }
             setTimeout(() => { selectorMap.invalidateSize(); }, 300);
@@ -410,33 +375,14 @@
             }
         }
 
-        function confirmLocation() {
-            if (selectedLatLng) {
-                document.getElementById('selected-location').style.display = 'flex';
-                document.getElementById('map-dialog').close();
-            }
-        }
+        function confirmLocation() { if (selectedLatLng) { document.getElementById('selected-location').style.display = 'flex'; document.getElementById('map-dialog').close(); } }
+        function openEditor() { document.getElementById('intro-card-area').style.display = 'none'; document.getElementById('action-btn-area').style.display = 'none'; document.getElementById('editor-container').style.display = 'flex'; if (bgm.paused) playAudio(); }
+        function closeEditor() { document.getElementById('intro-card-area').style.display = 'block'; document.getElementById('action-btn-area').style.display = 'block'; document.getElementById('editor-container').style.display = 'none'; editingDraftId = null; document.getElementById('pen-name').value = ''; document.getElementById('place-name').value = ''; document.getElementById('post-content').value = ''; document.getElementById('selected-location').style.display = 'none'; selectedLatLng = null; }
 
-        function openEditor() {
-            document.getElementById('intro-card-area').style.display = 'none';
-            document.getElementById('action-btn-area').style.display = 'none';
-            document.getElementById('editor-container').style.display = 'flex';
-            if (bgm.paused) playAudio();
-        }
-
-        function closeEditor() {
-            document.getElementById('intro-card-area').style.display = 'block';
-            document.getElementById('action-btn-area').style.display = 'block';
-            document.getElementById('editor-container').style.display = 'none';
-            editingDraftId = null;
-            document.getElementById('pen-name').value = '';
-            document.getElementById('place-name').value = '';
-            document.getElementById('post-content').value = '';
-            document.getElementById('selected-location').style.display = 'none';
-            selectedLatLng = null;
-        }
-
-        window.onload = async () => { await loadPosts(); };
+        // 初期化処理
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPosts();
+        });
     </script>
 </body>
 </html>
