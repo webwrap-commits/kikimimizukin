@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>きき耳ずきん</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@200&family=Noto+Serif+JP:wght@200;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,200,0,0&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -38,10 +39,11 @@
         .hero-img { width: 100%; max-width: 48rem; height: auto; margin-bottom: 2rem; padding: 0; box-sizing: border-box; }
 
         .editor-box { background: white; border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 2rem; width: calc(100% - 3rem); max-width: 42rem; box-sizing: border-box; margin: 0 1.5rem 2rem; }
-        input[type="text"], textarea { width: 100%; padding: 0.8rem; border: 1px solid #eee; border-radius: 0.4rem; box-sizing: border-box; font-family: var(--font-sans); font-size: 0.9rem; margin-bottom: 1.5rem; background: #fafafa; }
-        textarea { height: 150px; resize: none; }
+        input[type="text"], textarea { width: 100%; padding: 0.8rem; border: 1px solid #eee; border-radius: 0.4rem; box-sizing: border-box; font-family: var(--font-sans); font-size: 0.9rem; margin-bottom: 1rem; background: #fafafa; }
+        textarea { height: 150px; resize: none; margin-bottom: 1.5rem; }
         
         .btn-submit { background: var(--foreground); color: white; padding: 1rem; border-radius: 3rem; width: 100%; border: none; cursor: pointer; font-family: var(--font-serif); font-size: 1rem; letter-spacing: 0.2rem; margin-top: 1rem; }
+        .btn-draft { background: white; color: var(--foreground); border: 1px solid var(--foreground); padding: 0.8rem; border-radius: 3rem; width: 100%; cursor: pointer; font-family: var(--font-serif); font-size: 0.9rem; margin-top: 0.5rem; }
 
         #posts-list, #mypage-posts-list { width: 100%; max-width: 42rem; padding: 1rem 1.5rem 5rem; box-sizing: border-box; }
         .card { background-color: var(--card); border: 1px solid var(--border); border-radius: var(--radius-xl); margin-bottom: 2rem; overflow: hidden; }
@@ -51,14 +53,14 @@
         .author-label { font-size: 0.75rem; color: var(--muted-foreground); margin-left: 0.5rem; }
         .card-content { font-family: var(--font-sans); font-size: 0.9rem; line-height: 2; white-space: pre-wrap; color: #333; margin-bottom: 0.5rem; }
         
-        .reply-section { background-color: var(--reply-bg); padding: 1.5rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        .reply-section { background-color: var(--reply-bg); padding: 1rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 1rem; }
         .post-map { width: 100%; height: 200px; border-radius: 0.5rem; display: none; margin-top: 0.5rem; border: 1px solid var(--border); }
 
         .save-btn { background: none; border: none; cursor: pointer; color: var(--muted-foreground); display: flex; align-items: center; padding: 0; }
         .save-btn.active { color: var(--accent-color); font-variation-settings: 'FILL' 1; }
 
-        .mypage-tabs { display: flex; justify-content: center; gap: 2rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border); width: 100%; max-width: 36rem; }
-        .tab-btn { background: none; border: none; padding: 1rem; cursor: pointer; font-size: 0.9rem; color: var(--muted-foreground); }
+        .mypage-tabs { display: flex; justify-content: center; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border); width: 100%; max-width: 42rem; }
+        .tab-btn { background: none; border: none; padding: 1rem 0.5rem; cursor: pointer; font-size: 0.8rem; color: var(--muted-foreground); }
         .tab-btn.active { color: var(--foreground); border-bottom: 2px solid var(--foreground); }
 
         .section-title { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 200; letter-spacing: 0.3rem; margin: 2rem 0 1rem; width: 100%; text-align: center; }
@@ -67,9 +69,8 @@
         dialog::backdrop { background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(2px); }
         #map-selector { width: 100%; height: 350px; background: #eee; }
 
-        @media (max-width: 480px) {
-            .pin-actions { flex-direction: column !important; }
-        }
+        .draft-badge { background: #eee; color: #666; font-size: 0.6rem; padding: 0.2rem 0.4rem; border-radius: 0.2rem; margin-right: 0.5rem; vertical-align: middle; }
+        .draft-time { font-size: 0.7rem; color: var(--muted-foreground); display: block; margin-top: 0.2rem; }
     </style>
 </head>
 <body>
@@ -94,7 +95,7 @@
         <div id="top-view" class="active">
             <img src="https://res.cloudinary.com/dh6zibjr8/image/upload/v1770107819/kikimimitop_fzje9c.png" class="hero-img">
             <div id="intro-card-area" class="intro-card">
-                <div class="intro-text">きき耳ずきんをかぶると、街が少しやさしくなる。いつも通っている道のはずなのに、橋のたもとや池のそば、名もない場所から、小さな声が聞こえてくる。立札に書かれた昔の話や、忘れられかけた出来事。それを読んで、心に残ったことを、自分の言葉にしてそっと置いていく。誰かに届けるというより、街に返すような気持ちで。
+                <div class="intro-text">きき耳ずきんをかぶると、街が少しやさしくなる。いつも通っている道のはずなのに、橋のたもとや池のそば、名もない場所から、小さな声が聞こえてくる。それを読んで、心に残ったことを、自分の言葉にしてそっと置いていく。
 
 きき耳ずきんの中には、静かで、あたたかい世界が広がっている。</div>
             </div>
@@ -109,17 +110,21 @@
             <div id="editor-container">
                 <div class="editor-box">
                     <input type="text" id="pen-name" placeholder="ペンネーム">
-                    <input type="text" id="place-name" placeholder="場所のなまえ">
+                    <input type="text" id="place-name" placeholder="場所のなまえ（例：〇〇公園のベンチ）">
                     <textarea id="post-content" maxlength="200" placeholder="きき耳したことをおしえてください"></textarea>
+                    
                     <div class="pin-actions" style="display:flex; gap:1rem; margin-bottom:1.5rem;">
-                        <button class="btn-outline" style="flex:1; padding:0.8rem;" onclick="openMapSelector('current')"><span class="material-symbols-outlined">my_location</span>現在地からピンをたてる</button>
-                        <button class="btn-outline" style="flex:1; padding:0.8rem;" onclick="openMapSelector('search')"><span class="material-symbols-outlined">location_on</span>場所検索からピンをたてる</button>
+                        <button class="btn-outline" style="flex:1; padding:0.8rem;" onclick="openMapSelector('current')"><span class="material-symbols-outlined">my_location</span>現在地から</button>
+                        <button class="btn-outline" style="flex:1; padding:0.8rem;" onclick="openMapSelector('search')"><span class="material-symbols-outlined">location_on</span>場所検索から</button>
                     </div>
+                    
                     <div id="selected-location" style="display:none; margin-bottom:1.5rem; font-size:0.8rem; color:var(--accent-color); align-items:center; gap:0.5rem;">
                         <span class="material-symbols-outlined" style="font-size:1rem;">location_on</span>
                         <span id="location-coords">場所を記録しました</span>
                     </div>
-                    <button id="btn-save" class="btn-submit" onclick="submitPost()">きき耳したことを綴る</button>
+
+                    <button id="btn-save" class="btn-submit" onclick="submitPost('published')">きき耳したことを綴る</button>
+                    <button id="btn-draft" class="btn-draft" onclick="submitPost('draft')">場所記録して下書き保存</button>
                     <div onclick="closeEditor()" style="text-align:center; padding:1.5rem 1rem 0; cursor:pointer; font-size:0.8rem; color:var(--muted-foreground);">キャンセル</div>
                 </div>
             </div>
@@ -132,6 +137,7 @@
             <h2 style="font-family: var(--font-serif); font-weight: 200; margin: 2rem 0; text-align:center;">私のきき耳ずきん</h2>
             <div class="mypage-tabs">
                 <button id="tab-my" class="tab-btn active" onclick="switchTab('my')">わたしのきき耳</button>
+                <button id="tab-draft" class="tab-btn" onclick="switchTab('draft')">きき耳の種</button>
                 <button id="tab-fav" class="tab-btn" onclick="switchTab('fav')">気になるきき耳</button>
             </div>
             <div id="mypage-posts-list"></div>
@@ -154,50 +160,51 @@
     </main>
 
     <script>
-        let posts = [{ id: 1, penName: '旅人', placeName: '湊橋のたもと', content: '古い石碑に、かつてここが海の入り口だったと書いてありました。今はビルが立ち並んでいますが、目を閉じると波の音が聞こえてくるようです。', date: '2026/02/04', isFav: false, lat: 35.6812, lng: 139.7671 }];
+        // Supabase接続情報（ご自身のURLとAnonキーをここに入れてください）
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_KEY = 'YOUR_SUPABASE_KEY';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let posts = [];
         let currentTab = 'my';
         let selectorMap, selectorMarker, selectedLatLng = null;
         let postMaps = {};
+        let editingDraftId = null;
         const bgm = document.getElementById('bgm');
 
-        // 音声制御の基本関数
+        let userId = localStorage.getItem('kikimimi_user_id');
+        if (!userId) {
+            userId = 'user_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('kikimimi_user_id', userId);
+        }
+
         function playAudio() {
             bgm.play().catch(e => console.log("再生失敗:", e));
             document.getElementById('audio-icon').innerText = 'volume_up';
             document.getElementById('audio-text').innerText = '音を奏でています';
         }
-
         function pauseAudio() {
             bgm.pause();
             document.getElementById('audio-icon').innerText = 'volume_off';
             document.getElementById('audio-text').innerText = '静寂の中';
         }
+        function toggleAudio() { if (bgm.paused) { playAudio(); } else { pauseAudio(); } }
 
-        function toggleAudio() {
-            if (bgm.paused) { playAudio(); } else { pauseAudio(); }
-        }
-
-        // スマホでブラウザを閉じたり裏に回した時の挙動
-        document.addEventListener("visibilitychange", () => {
-            if (document.hidden) {
-                pauseAudio(); // 隠れたら止める
-            }
-        });
-
-        function showView(viewId) {
+        async function showView(viewId) {
             document.querySelectorAll('main > div').forEach(div => div.style.display = 'none');
             document.getElementById(viewId).style.display = 'flex';
-            
             const headerBtnText = document.getElementById('header-btn-text');
             const headerBtnIcon = document.getElementById('header-btn-icon');
             if (viewId === 'mypage-view') {
                 headerBtnText.innerText = 'もどる';
                 headerBtnIcon.innerText = 'arrow_back';
+                await loadPosts();
+                switchTab('my');
             } else {
                 headerBtnText.innerText = 'マイページ';
                 headerBtnIcon.innerText = 'person';
+                await loadPosts();
             }
-            renderPosts();
         }
 
         function toggleMypage() {
@@ -210,71 +217,159 @@
 
         function switchTab(tab) {
             currentTab = tab;
-            document.getElementById('tab-my').classList.toggle('active', tab === 'my');
-            document.getElementById('tab-fav').classList.toggle('active', tab === 'fav');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`tab-${tab}`).classList.add('active');
             renderPosts();
         }
 
-        function toggleFav(id) {
-            const post = posts.find(p => p.id === id);
-            if (post) post.isFav = !post.isFav;
+        async function loadPosts() {
+            const { data, error } = await supabase
+                .from('kikimimi_posts')
+                .select('*')
+                .order('created_at', { ascending: false });
+            if (!error) posts = data;
             renderPosts();
+        }
+
+        async function submitPost(status) {
+            const penName = document.getElementById('pen-name').value;
+            const placeName = document.getElementById('place-name').value;
+            const content = document.getElementById('post-content').value;
+
+            if (!selectedLatLng && !editingDraftId) {
+                alert("場所を記録してください");
+                return;
+            }
+
+            const btn = (status === 'published') ? document.getElementById('btn-save') : document.getElementById('btn-draft');
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = "預かり中...";
+
+            const postData = {
+                pen_name: penName || (status === 'published' ? 'ななし' : ''),
+                place_name: placeName || 'どこかの場所',
+                content: content,
+                lat: selectedLatLng ? selectedLatLng.lat : 0,
+                lng: selectedLatLng ? selectedLatLng.lng : 0,
+                status: status,
+                user_id: userId
+            };
+
+            let error;
+            if (editingDraftId) {
+                const { error: err } = await supabase.from('kikimimi_posts').update(postData).eq('id', editingDraftId);
+                error = err;
+            } else {
+                const { error: err } = await supabase.from('kikimimi_posts').insert([postData]);
+                error = err;
+            }
+
+            if (!error) {
+                closeEditor();
+                await loadPosts();
+                if (status === 'draft') alert("場所を種として保存しました。マイページからいつでも綴れます。");
+            } else {
+                alert("エラーが発生しました");
+            }
+            btn.disabled = false;
+            btn.innerText = originalText;
         }
 
         function renderPosts() {
-            const containers = [
-                { el: document.getElementById('posts-list'), type: 'all', suffix: 'top' },
-                { el: document.getElementById('mypage-posts-list'), type: currentTab, suffix: 'my' }
-            ];
+            const topList = document.getElementById('posts-list');
+            const mypageList = document.getElementById('mypage-posts-list');
+            if (!topList) return;
 
-            containers.forEach(c => {
-                if (!c.el) return;
-                const items = c.type === 'fav' ? posts.filter(p => p.isFav) : posts;
-                c.el.innerHTML = items.map(post => `
-                    <div class="card">
-                        <div class="card-inner">
-                            <div class="card-header">
-                                <div><span class="place-name-bold">${post.placeName}</span><span class="author-label">@${post.penName}</span></div>
-                                <div style="display: flex; align-items: center; gap: 0.8rem;">
-                                    <span style="font-size:0.65rem; color:#999;">${post.date}</span>
-                                    <button class="save-btn ${post.isFav ? 'active' : ''}" onclick="toggleFav(${post.id})">
-                                        <span class="material-symbols-outlined" style="font-size: 1.2rem;">bookmark</span>
-                                    </button>
-                                </div>
+            const publicPosts = posts.filter(p => p.status === 'published');
+            topList.innerHTML = publicPosts.map(post => renderCard(post, 'top')).join('');
+
+            if (mypageList) {
+                let filtered = [];
+                if (currentTab === 'my') filtered = posts.filter(p => p.user_id === userId && p.status === 'published');
+                if (currentTab === 'draft') filtered = posts.filter(p => p.user_id === userId && p.status === 'draft');
+                if (currentTab === 'fav') {
+                    const favIds = JSON.parse(localStorage.getItem('kikimimi_favs') || '[]');
+                    filtered = posts.filter(p => favIds.includes(String(p.id)));
+                }
+                mypageList.innerHTML = filtered.map(post => renderCard(post, 'my')).join('');
+            }
+        }
+
+        function renderCard(post, suffix) {
+            const isDraft = post.status === 'draft';
+            const favIds = JSON.parse(localStorage.getItem('kikimimi_favs') || '[]');
+            const isFav = favIds.includes(String(post.id));
+            const dateStr = new Date(post.created_at).toLocaleDateString();
+            const timeStr = new Date(post.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+            return `
+                <div class="card">
+                    <div class="card-inner">
+                        <div class="card-header">
+                            <div>
+                                ${isDraft ? '<span class="draft-badge">種</span>' : ''}
+                                <span class="place-name-bold">${post.place_name}</span>
+                                <span class="author-label">@${post.pen_name || '...'}</span>
+                                ${isDraft ? `<span class="draft-time">${dateStr} ${timeStr} に記録</span>` : ''}
                             </div>
-                            <div class="card-content">${post.content}</div>
+                            <div style="display: flex; align-items: center; gap: 0.8rem;">
+                                ${!isDraft ? `<span style="font-size:0.65rem; color:#999;">${dateStr}</span>` : ''}
+                                ${!isDraft ? `
+                                    <button class="save-btn ${isFav ? 'active' : ''}" onclick="toggleFav('${post.id}')">
+                                        <span class="material-symbols-outlined" style="font-size: 1.2rem;">bookmark</span>
+                                    </button>` : ''}
+                            </div>
                         </div>
-                        <div class="reply-section">
-                            <button id="btn-map-${c.suffix}-${post.id}" class="btn-outline" onclick="showPostMap(${post.id}, ${post.lat}, ${post.lng}, '${c.suffix}')">
-                                <span class="material-symbols-outlined" style="font-size: 1rem;">map</span>
-                                <span>地図を表示</span>
-                            </button>
-                            <div id="map-${c.suffix}-${post.id}" class="post-map"></div>
-                        </div>
+                        <div class="card-content">${post.content || (isDraft ? '（まだ言葉が綴られていません）' : '')}</div>
                     </div>
-                `).join('');
-            });
+                    <div class="reply-section">
+                        ${isDraft ? `
+                            <button class="btn-outline" onclick="editDraft(${post.id})">
+                                <span class="material-symbols-outlined" style="font-size: 1rem;">edit</span>
+                                <span>言葉を綴る</span>
+                            </button>` : `
+                            <button id="btn-map-${suffix}-${post.id}" class="btn-outline" onclick="showPostMap(${post.id}, ${post.lat}, ${post.lng}, '${suffix}')">
+                                <span class="material-symbols-outlined" style="font-size: 1rem;">map</span>
+                                <span>場所を確認</span>
+                            </button>
+                            <div id="map-${suffix}-${post.id}" class="post-map"></div>
+                        `}
+                    </div>
+                </div>
+            `;
+        }
+
+        function editDraft(id) {
+            const draft = posts.find(p => p.id === id);
+            if (!draft) return;
+            editingDraftId = id;
+            selectedLatLng = { lat: draft.lat, lng: draft.lng };
+            document.getElementById('pen-name').value = draft.pen_name || '';
+            document.getElementById('place-name').value = draft.place_name || '';
+            document.getElementById('post-content').value = draft.content || '';
+            document.getElementById('selected-location').style.display = 'flex';
+            document.getElementById('location-coords').innerText = "記録済みの場所を読み込みました";
+            showView('top-view');
+            openEditor();
+            document.getElementById('editor-container').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function toggleFav(id) {
+            let favs = JSON.parse(localStorage.getItem('kikimimi_favs') || '[]');
+            id = String(id);
+            if (favs.includes(id)) { favs = favs.filter(f => f !== id); } else { favs.push(id); }
+            localStorage.setItem('kikimimi_favs', JSON.stringify(favs));
+            renderPosts();
         }
 
         function showPostMap(id, lat, lng, suffix) {
             const mapId = `map-${suffix}-${id}`;
-            const mapDiv = document.getElementById(mapId);
-            const btn = document.getElementById(`btn-map-${suffix}-${id}`);
-            if (!mapDiv || !btn) return;
-
-            mapDiv.style.display = 'block';
-            btn.style.display = 'none';
-
-            if (postMaps[mapId]) {
-                postMaps[mapId].remove();
-            }
-
+            document.getElementById(mapId).style.display = 'block';
+            document.getElementById(`btn-map-${suffix}-${id}`).style.display = 'none';
             const map = L.map(mapId).setView([lat, lng], 15);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
             L.marker([lat, lng]).addTo(map);
-            
-            postMaps[mapId] = map;
-
             setTimeout(() => { map.invalidateSize(); }, 200);
         }
 
@@ -284,20 +379,14 @@
             if (!selectorMap) {
                 selectorMap = L.map('map-selector').setView([35.6812, 139.7671], 15);
                 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(selectorMap);
-                selectorMap.on('click', e => {
-                    updateSelectorMarker(e.latlng);
-                });
+                selectorMap.on('click', e => updateSelectorMarker(e.latlng));
             }
-
             document.getElementById('map-search-bar').style.display = (mode === 'search') ? 'flex' : 'none';
-
             if (mode === 'current' && navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(pos => {
                     const latlng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
                     selectorMap.setView(latlng, 16);
                     updateSelectorMarker(latlng);
-                }, (err) => {
-                    console.log("位置情報が取得できませんでした");
                 });
             }
             setTimeout(() => { selectorMap.invalidateSize(); }, 300);
@@ -311,22 +400,12 @@
 
         async function searchLocation() {
             const query = document.getElementById('map-search-input').value;
-            if (!query) return;
-            
-            try {
-                const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
-                const data = await response.json();
-                
-                if (data && data.length > 0) {
-                    const latlng = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-                    selectorMap.setView(latlng, 16);
-                    updateSelectorMarker(latlng);
-                } else {
-                    alert('場所が見つかりませんでした');
-                }
-            } catch (error) {
-                console.error('検索エラー:', error);
-                alert('検索中にエラーが発生しました');
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+            const data = await res.json();
+            if (data.length > 0) {
+                const latlng = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+                selectorMap.setView(latlng, 16);
+                updateSelectorMarker(latlng);
             }
         }
 
@@ -334,8 +413,6 @@
             if (selectedLatLng) {
                 document.getElementById('selected-location').style.display = 'flex';
                 document.getElementById('map-dialog').close();
-            } else {
-                alert('地図をタップして場所を選択してください');
             }
         }
 
@@ -343,51 +420,22 @@
             document.getElementById('intro-card-area').style.display = 'none';
             document.getElementById('action-btn-area').style.display = 'none';
             document.getElementById('editor-container').style.display = 'flex';
-            
-            // 投稿フォームを表示したタイミングで音を鳴らす
-            if (bgm.paused) {
-                playAudio();
-            }
+            if (bgm.paused) playAudio();
         }
 
         function closeEditor() {
             document.getElementById('intro-card-area').style.display = 'block';
             document.getElementById('action-btn-area').style.display = 'block';
             document.getElementById('editor-container').style.display = 'none';
+            editingDraftId = null;
+            document.getElementById('pen-name').value = '';
+            document.getElementById('place-name').value = '';
+            document.getElementById('post-content').value = '';
+            document.getElementById('selected-location').style.display = 'none';
+            selectedLatLng = null;
         }
 
-        function submitPost() {
-            const content = document.getElementById('post-content').value;
-            if (!content) return;
-            const btn = document.getElementById('btn-save');
-            btn.disabled = true; btn.innerText = '預かりました...';
-            setTimeout(() => {
-                posts.unshift({
-                    id: Date.now(),
-                    penName: document.getElementById('pen-name').value || 'ななし',
-                    placeName: document.getElementById('place-name').value || 'どこかの場所',
-                    content: content,
-                    date: new Date().toLocaleDateString(),
-                    isFav: false,
-                    lat: selectedLatLng ? selectedLatLng.lat : 35.6812,
-                    lng: selectedLatLng ? selectedLatLng.lng : 139.7671
-                });
-                btn.disabled = false; btn.innerText = 'きき耳したことを綴る';
-                closeEditor();
-                document.getElementById('post-content').value = '';
-                document.getElementById('pen-name').value = '';
-                document.getElementById('place-name').value = '';
-                selectedLatLng = null;
-                document.getElementById('selected-location').style.display = 'none';
-                renderPosts();
-            }, 1000);
-        }
-
-        window.onload = () => {
-            // 初期状態は音を止めておく
-            pauseAudio();
-            renderPosts();
-        };
+        window.onload = async () => { await loadPosts(); };
     </script>
 </body>
 </html>
