@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>きき耳ずきん</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@200;300;400&family=Noto+Serif+JP:wght@200;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,200,0,0&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300&family=Noto+Serif+JP:wght@200;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,200,0,0&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
@@ -14,10 +14,10 @@
             --muted-foreground: #71717a; --radius-xl: 0.75rem; --font-serif: 'Noto Serif JP', serif; --font-sans: 'Noto Sans JP', sans-serif;
             --accent-color: #eb6101; --reply-bg: #f7f7f7; --danger-color: #ef4444;
         }
-        body { font-family: var(--font-sans); background-color: var(--background); color: var(--foreground); margin: 0; padding: 0; line-height: 1.8; display: flex; flex-direction: column; align-items: center; font-weight: 200; -webkit-text-size-adjust: 100%; }
+        body { font-family: var(--font-sans); background-color: var(--background); color: var(--foreground); margin: 0; padding: 0; line-height: 1.8; display: flex; flex-direction: column; align-items: center; font-weight: 300; -webkit-text-size-adjust: 100%; }
         header { width: 100%; max-width: 48rem; padding: 4rem 1.5rem 1rem; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; }
         h1 { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 200; letter-spacing: 0.3rem; margin: 0; cursor: pointer; }
-        .btn-outline { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.75rem; border: 1px solid var(--border); background: white; cursor: pointer; color: var(--foreground); transition: opacity 0.3s; width: fit-content; }
+        .btn-outline { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.75rem; border: 1px solid var(--border); background: white; cursor: pointer; color: var(--foreground); transition: opacity 0.3s; width: fit-content; font-family: var(--font-sans); font-weight: 300; }
         .btn-danger { color: var(--danger-color); border-color: var(--border); }
         main { width: 100%; max-width: 48rem; display: flex; flex-direction: column; align-items: center; }
         .audio-control-btn { position: sticky; top: 1rem; margin-left: auto; margin-right: 1.5rem; margin-bottom: 1rem; z-index: 100; background: rgba(255,255,255,0.8); backdrop-filter: blur(4px); border: 1px solid var(--border); border-radius: 2rem; padding: 0.4rem 1rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.65rem; color: var(--muted-foreground); cursor: pointer; }
@@ -25,7 +25,7 @@
         #top-view.active, #mypage-view.active { display: flex; }
         #editor-container { width: 100%; display: none; flex-direction: column; align-items: center; }
         .intro-card { background: white; border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 2.5rem 2rem; margin: 0 1.5rem 1rem; max-width: 42rem; box-sizing: border-box; }
-        .intro-text { font-family: var(--font-sans); font-size: 0.9rem; color: #333; line-height: 2.5; letter-spacing: 0.05rem; white-space: pre-wrap; }
+        .intro-text { font-family: var(--font-sans); font-size: 0.9rem; color: #333; line-height: 2.5; letter-spacing: 0.05rem; white-space: pre-wrap; font-weight: 300; }
         .hero-img { width: 100%; max-width: 48rem; height: auto; margin-bottom: 2rem; padding: 0; box-sizing: border-box; }
         
         .editor-box { background: white; border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 1.5rem; width: 100%; max-width: 42rem; box-sizing: border-box; margin-bottom: 2rem; }
@@ -33,15 +33,15 @@
         input[type="text"], textarea { width: 100%; padding: 0.8rem; border: 1px solid #eee; border-radius: 0.4rem; box-sizing: border-box; font-family: var(--font-sans); font-size: 0.9rem; margin-bottom: 1rem; background: #fafafa; font-weight: 300; }
         textarea { height: 150px; resize: none; margin-bottom: 1.5rem; }
         
-        /* 綴るボタン：サイズを0.9remに統一、weightを300に固定 */
+        /* ボタンとテキスト：Noto Sans JP 300 / 0.9rem */
         .btn-submit { background: var(--foreground); color: white; padding: 1rem; border-radius: 3rem; width: 100%; border: none; cursor: pointer; font-family: var(--font-sans) !important; font-weight: 300 !important; font-size: 0.9rem; letter-spacing: 0.2rem; margin-top: 1rem; }
-        /* 下書きボタン：綴るボタンと同じサイズと太さに設定 */
         .btn-draft { background: white; color: var(--foreground); border: 1px solid var(--foreground); padding: 0.8rem; border-radius: 3rem; width: 100%; cursor: pointer; font-family: var(--font-sans) !important; font-weight: 300 !important; font-size: 0.9rem; letter-spacing: 0.2rem; margin-top: 0.5rem; }
-        /* やめる：weightを300に */
         .btn-cancel { text-align:center; padding:1.5rem 1rem 0; cursor:pointer; font-size:0.8rem; color:var(--muted-foreground); font-family: var(--font-sans) !important; font-weight: 300 !important; }
         
-        .pin-actions { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1.5rem; width: 100%; }
-        .pin-actions .btn-outline { width: 100%; padding: 0.8rem; box-sizing: border-box; font-weight: 300; }
+        /* ピン留めアクション：ブラウザで横並び、スマホで縦並び */
+        .pin-actions { display: flex; flex-direction: row; gap: 0.8rem; margin-bottom: 1.5rem; width: 100%; }
+        .pin-actions .btn-outline { flex: 1; padding: 0.8rem; box-sizing: border-box; }
+        @media (max-width: 600px) { .pin-actions { flex-direction: column; } }
 
         #posts-list, #mypage-posts-list { width: 100%; max-width: 42rem; padding: 1rem 1.5rem 5rem; box-sizing: border-box; }
         .card { background-color: var(--card); border: 1px solid var(--border); border-radius: var(--radius-xl); margin-bottom: 2rem; overflow: hidden; }
@@ -53,7 +53,7 @@
         .place-name-bold { font-family: var(--font-sans) !important; font-weight: 300 !important; font-size: 0.95rem; letter-spacing: 0.08rem; line-height: 1.4; }
         .author-info-row { display: flex; align-items: center; gap: 0.8rem; font-size: 0.75rem; color: var(--muted-foreground); }
         
-        .card-content { font-family: var(--font-sans); font-size: 0.9rem; line-height: 2; white-space: pre-wrap; color: #333; margin-bottom: 0.5rem; }
+        .card-content { font-family: var(--font-sans); font-size: 0.9rem; line-height: 2; white-space: pre-wrap; color: #333; margin-bottom: 0.5rem; font-weight: 300; }
         .reply-section { background-color: var(--reply-bg); padding: 1rem; border-top: 1px solid var(--border); display: flex; flex-direction: row; justify-content: center; gap: 1rem; }
         
         .post-map { width: 100%; height: 0; padding-bottom: 56.25%; border-radius: 0.5rem; display: none; margin-top: 0.5rem; border: 1px solid var(--border); position: relative; }
@@ -63,9 +63,8 @@
         .save-btn.active { color: var(--accent-color); font-variation-settings: 'FILL' 1; }
         
         .mypage-title { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 200; letter-spacing: 0.3rem; margin: 2rem 0; text-align:center; }
-        
         .mypage-tabs { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border); width: 100%; max-width: 42rem; }
-        .tab-btn { background: none; border: none; padding: 1rem 0.5rem; cursor: pointer; font-size: 0.75rem; color: var(--muted-foreground); white-space: nowrap; }
+        .tab-btn { background: none; border: none; padding: 1rem 0.5rem; cursor: pointer; font-size: 0.75rem; color: var(--muted-foreground); white-space: nowrap; font-family: var(--font-sans); font-weight: 300; }
         .tab-btn.active { color: var(--foreground); border-bottom: 2px solid var(--foreground); }
         .tab-btn.has-drafts { color: var(--accent-color); }
         
@@ -73,9 +72,9 @@
         dialog { border: none; border-radius: var(--radius-xl); padding: 0; width: 95%; max-width: 40rem; }
         dialog::backdrop { background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(2px); }
         #map-selector { width: 100%; height: 350px; background: #eee; }
-        .draft-badge { background: #eee; color: #666; font-size: 0.6rem; padding: 0.2rem 0.4rem; border-radius: 0.2rem; margin-right: 0.4rem; display: inline-block; }
+        .draft-badge { background: #eee; color: #666; font-size: 0.6rem; padding: 0.2rem 0.4rem; border-radius: 0.2rem; margin-right: 0.4rem; display: inline-block; font-family: var(--font-sans); font-weight: 300; }
 
-        #toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); color: white; padding: 0.8rem 1.5rem; border-radius: 2rem; font-size: 0.8rem; z-index: 1000; display: none; pointer-events: none; white-space: nowrap; }
+        #toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); color: white; padding: 0.8rem 1.5rem; border-radius: 2rem; font-size: 0.8rem; z-index: 1000; display: none; pointer-events: none; white-space: nowrap; font-family: var(--font-sans); font-weight: 300; }
         .toast-animation { animation: fadeInOut 3s forwards; }
         @keyframes fadeInOut { 0% { opacity: 0; bottom: 1rem; } 15% { opacity: 1; bottom: 2rem; } 85% { opacity: 1; bottom: 2rem; } 100% { opacity: 0; bottom: 1rem; } }
     </style>
@@ -149,7 +148,7 @@
             <div class="mypage-tabs">
                 <button id="tab-my" class="tab-btn active" onclick="switchTab('my')">わたしのきき耳</button>
                 <button id="tab-fav" class="tab-btn" onclick="switchTab('fav')">気になるきき耳</button>
-                <button id="tab-draft" class="tab-btn" onclick="switchTab('draft') Button削除ボタン)">下書き保存</button>
+                <button id="tab-draft" class="tab-btn" onclick="switchTab('draft')">下書き保存</button>
             </div>
             <div id="mypage-posts-list"></div>
         </div>
@@ -269,11 +268,8 @@
             const placeName = document.getElementById('place-name').value.trim();
             const content = document.getElementById('post-content').value.trim();
 
-            if (status === 'published') {
-                if (!penName || !placeName || !content) {
-                    showToast("未入力の項目があります");
-                    return;
-                }
+            if (status === 'published' && (!penName || !placeName || !content)) {
+                showToast("未入力の項目があります"); return;
             }
 
             const btn = (status === 'published') ? document.getElementById('btn-save') : document.getElementById('btn-draft');
@@ -300,9 +296,8 @@
                     error = err;
                 }
                 if (!error) {
-                    if (status === 'draft') showToast("下書き保存完了");
-                    closeEditor();
-                    await loadPosts();
+                    showToast(status === 'draft' ? "下書き保存完了" : "きき耳を綴りました");
+                    closeEditor(); await loadPosts();
                 } else { alert("保存に失敗しました"); }
             } catch(e) { alert("通信エラーが発生しました"); }
             btn.disabled = false; btn.innerText = originalText;
@@ -314,16 +309,9 @@
                 const { error } = await supabaseClient.from('kikimimi_posts').delete().eq('id', id);
                 if (!error) {
                     posts = posts.filter(p => p.id !== id);
-                    showToast("削除しました");
-                    renderPosts();
-                } else { 
-                    console.error("削除エラー:", error);
-                    alert("削除に失敗しました。"); 
-                }
-            } catch(e) { 
-                console.error("削除処理例外:", e);
-                alert("通信エラーが発生しました"); 
-            }
+                    showToast("削除しました"); renderPosts();
+                } else { alert("削除に失敗しました。"); }
+            } catch(e) { alert("通信エラーが発生しました"); }
         }
 
         function renderPosts() {
@@ -360,19 +348,13 @@
                     <div class="card-inner">
                         <div class="card-header">
                             <div class="card-header-main">
-                                <div class="place-name-bold">
-                                    ${isDraft ? '<span class="draft-badge">下書き</span>' : ''}${post.place_name}
-                                </div>
+                                <div class="place-name-bold">${isDraft ? '<span class="draft-badge">下書き</span>' : ''}${post.place_name}</div>
                                 <div class="author-info-row">
                                     <span>@${post.pen_name || '...'}</span>
                                     ${!isDraft ? `<span>｜</span><span>${dateStr}</span>` : ''}
                                 </div>
                             </div>
-                            ${!isDraft ? `
-                                <button class="save-btn ${isFav ? 'active' : ''}" onclick="toggleFav('${post.id}')">
-                                    <span class="material-symbols-outlined" style="font-size: 1.2rem;">bookmark</span>
-                                </button>
-                            ` : ''}
+                            ${!isDraft ? `<button class="save-btn ${isFav ? 'active' : ''}" onclick="toggleFav('${post.id}')"><span class="material-symbols-outlined" style="font-size: 1.2rem;">bookmark</span></button>` : ''}
                         </div>
                         <div class="card-content">${post.content || (isDraft ? '（言葉はまだ綴られていません）' : '')}</div>
                     </div>
@@ -391,14 +373,11 @@
         function editDraft(id) {
             const draft = posts.find(p => p.id === id);
             if (!draft) return;
-            editingDraftId = id;
-            selectedLatLng = { lat: draft.lat, lng: draft.lng };
+            editingDraftId = id; selectedLatLng = { lat: draft.lat, lng: draft.lng };
             document.getElementById('pen-name').value = draft.pen_name || '';
             document.getElementById('place-name').value = draft.place_name || '';
             document.getElementById('post-content').value = draft.content || '';
-            if(selectedLatLng && selectedLatLng.lat !== 0) {
-                document.getElementById('selected-location').style.display = 'flex';
-            }
+            if(selectedLatLng && selectedLatLng.lat !== 0) document.getElementById('selected-location').style.display = 'flex';
             showView('top-view'); openEditor();
             document.getElementById('editor-container').scrollIntoView({ behavior: 'smooth' });
         }
@@ -407,8 +386,7 @@
             let favs = JSON.parse(localStorage.getItem('kikimimi_favs') || '[]');
             id = String(id);
             if (favs.includes(id)) favs = favs.filter(f => f !== id); else favs.push(id);
-            localStorage.setItem('kikimimi_favs', JSON.stringify(favs));
-            renderPosts();
+            localStorage.setItem('kikimimi_favs', JSON.stringify(favs)); renderPosts();
         }
 
         function showPostMap(id, lat, lng, suffix) {
@@ -417,14 +395,8 @@
             if(!mapContainer) return;
             mapContainer.style.display = 'block';
             document.getElementById(`btn-map-${suffix}-${id}`).style.display = 'none';
-            
             const map = L.map(mapId).setView([lat, lng], 13);
-            L.tileLayer(TILE_URL, { 
-                attribution: TILE_ATTRIB, 
-                maxZoom: 18,
-                detectRetina: true 
-            }).addTo(map);
-            
+            L.tileLayer(TILE_URL, { attribution: TILE_ATTRIB, maxZoom: 18, detectRetina: true }).addTo(map);
             L.marker([lat, lng]).addTo(map);
             setTimeout(() => { map.invalidateSize(); }, 200);
         }
@@ -433,11 +405,7 @@
             document.getElementById('map-dialog').showModal();
             if (!selectorMap) {
                 selectorMap = L.map('map-selector').setView([35.6812, 139.7671], 13);
-                L.tileLayer(TILE_URL, { 
-                    attribution: TILE_ATTRIB, 
-                    maxZoom: 18,
-                    detectRetina: true 
-                }).addTo(selectorMap);
+                L.tileLayer(TILE_URL, { attribution: TILE_ATTRIB, maxZoom: 18, detectRetina: true }).addTo(selectorMap);
                 selectorMap.on('click', e => updateSelectorMarker(e.latlng));
             }
             document.getElementById('map-search-bar').style.display = (mode === 'search') ? 'flex' : 'none';
@@ -452,8 +420,7 @@
 
         function updateSelectorMarker(latlng) {
             if (selectorMarker) selectorMap.removeLayer(selectorMarker);
-            selectorMarker = L.marker(latlng).addTo(selectorMap);
-            selectedLatLng = latlng;
+            selectorMarker = L.marker(latlng).addTo(selectorMap); selectedLatLng = latlng;
         }
 
         async function searchLocation() {
@@ -468,21 +435,14 @@
 
         function confirmLocation() { if (selectedLatLng) { document.getElementById('selected-location').style.display = 'flex'; document.getElementById('map-dialog').close(); } }
         function openEditor() { 
-            document.getElementById('intro-card-area').style.display = 'none'; 
-            document.getElementById('action-btn-area').style.display = 'none'; 
-            document.getElementById('editor-container').style.display = 'flex'; 
-            if (bgm.paused) playAudio();
+            document.getElementById('intro-card-area').style.display = 'none'; document.getElementById('action-btn-area').style.display = 'none'; 
+            document.getElementById('editor-container').style.display = 'flex'; if (bgm.paused) playAudio();
         }
         function closeEditor() { 
-            document.getElementById('intro-card-area').style.display = 'block'; 
-            document.getElementById('action-btn-area').style.display = 'block'; 
-            document.getElementById('editor-container').style.display = 'none'; 
-            editingDraftId = null; 
-            document.getElementById('pen-name').value = ''; 
-            document.getElementById('place-name').value = ''; 
-            document.getElementById('post-content').value = ''; 
-            document.getElementById('selected-location').style.display = 'none'; 
-            selectedLatLng = null; 
+            document.getElementById('intro-card-area').style.display = 'block'; document.getElementById('action-btn-area').style.display = 'block'; 
+            document.getElementById('editor-container').style.display = 'none'; editingDraftId = null; 
+            document.getElementById('pen-name').value = ''; document.getElementById('place-name').value = ''; 
+            document.getElementById('post-content').value = ''; document.getElementById('selected-location').style.display = 'none'; selectedLatLng = null; 
         }
 
         document.addEventListener('DOMContentLoaded', () => {
