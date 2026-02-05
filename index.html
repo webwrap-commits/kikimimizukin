@@ -17,7 +17,7 @@
         body { font-family: var(--font-sans); background-color: var(--background); color: var(--foreground); margin: 0; padding: 0; line-height: 1.8; display: flex; flex-direction: column; align-items: center; font-weight: 200; -webkit-text-size-adjust: 100%; }
         header { width: 100%; max-width: 48rem; padding: 4rem 1.5rem 1rem; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; }
         h1 { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 200; letter-spacing: 0.3rem; margin: 0; cursor: pointer; }
-        .btn-outline { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.75rem; border: 1px solid var(--border); background: white; cursor: pointer; color: var(--foreground); transition: opacity 0.3s; }
+        .btn-outline { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.75rem; border: 1px solid var(--border); background: white; cursor: pointer; color: var(--foreground); transition: opacity 0.3s; width: fit-content; }
         .btn-danger { color: var(--danger-color); border-color: var(--border); }
         main { width: 100%; max-width: 48rem; display: flex; flex-direction: column; align-items: center; }
         .audio-control-btn { position: sticky; top: 1rem; margin-left: auto; margin-right: 1.5rem; margin-bottom: 1rem; z-index: 100; background: rgba(255,255,255,0.8); backdrop-filter: blur(4px); border: 1px solid var(--border); border-radius: 2rem; padding: 0.4rem 1rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.65rem; color: var(--muted-foreground); cursor: pointer; }
@@ -49,8 +49,8 @@
         .author-info-row { display: flex; align-items: center; gap: 0.8rem; font-size: 0.75rem; color: var(--muted-foreground); }
         
         .card-content { font-family: var(--font-sans); font-size: 0.9rem; line-height: 2; white-space: pre-wrap; color: #333; margin-bottom: 0.5rem; }
-        .reply-section { background-color: var(--reply-bg); padding: 1rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 1rem; }
-        /* 16:9比率に調整（width: 100%に対して height: 56.25%） */
+        .reply-section { background-color: var(--reply-bg); padding: 1rem; border-top: 1px solid var(--border); display: flex; flex-direction: row; justify-content: center; gap: 1rem; }
+        
         .post-map { width: 100%; height: 0; padding-bottom: 56.25%; border-radius: 0.5rem; display: none; margin-top: 0.5rem; border: 1px solid var(--border); position: relative; }
         .post-map .leaflet-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 0.5rem; }
         
@@ -306,12 +306,21 @@
         async function deletePost(id) {
             if (!confirm("この下書きを削除してもよろしいですか？")) return;
             try {
+                // DBから削除を実行
                 const { error } = await supabaseClient.from('kikimimi_posts').delete().eq('id', id);
                 if (!error) {
+                    // DB削除成功後、ローカル配列からも即座に取り除いて再描画
+                    posts = posts.filter(p => p.id !== id);
                     showToast("削除しました");
-                    await loadPosts();
-                } else { alert("削除に失敗しました"); }
-            } catch(e) { alert("通信エラーが発生しました"); }
+                    renderPosts();
+                } else { 
+                    console.error("削除エラー:", error);
+                    alert("削除に失敗しました。権限がないか通信エラーの可能性があります。"); 
+                }
+            } catch(e) { 
+                console.error("削除処理例外:", e);
+                alert("通信エラーが発生しました"); 
+            }
         }
 
         function renderPosts() {
@@ -366,10 +375,8 @@
                     </div>
                     <div class="reply-section">
                         ${isDraft ? `
-                            <div style="display:flex; gap:0.5rem; width:100%;">
-                                <button class="btn-outline" style="flex:2;" onclick="editDraft(${post.id})"><span class="material-symbols-outlined" style="font-size: 1rem;">edit</span><span>言葉を綴る</span></button>
-                                <button class="btn-outline btn-danger" style="flex:1;" onclick="deletePost(${post.id})"><span class="material-symbols-outlined" style="font-size: 1rem;">delete</span><span>削除</span></button>
-                            </div>
+                            <button class="btn-outline" onclick="editDraft(${post.id})"><span class="material-symbols-outlined" style="font-size: 1rem;">edit</span><span>言葉を綴る</span></button>
+                            <button class="btn-outline btn-danger" onclick="deletePost(${post.id})"><span class="material-symbols-outlined" style="font-size: 1rem;">delete</span><span>削除</span></button>
                         ` : `
                             <button id="btn-map-${suffix}-${post.id}" class="btn-outline" onclick="showPostMap(${post.id}, ${post.lat}, ${post.lng}, '${suffix}')"><span class="material-symbols-outlined" style="font-size: 1rem;">map</span><span>場所を確認</span></button>
                             <div id="map-${suffix}-${post.id}" class="post-map"></div>
@@ -408,7 +415,6 @@
             mapContainer.style.display = 'block';
             document.getElementById(`btn-map-${suffix}-${id}`).style.display = 'none';
             
-            // シンプルな色彩になるズームレベル13に設定
             const map = L.map(mapId).setView([lat, lng], 13);
             L.tileLayer(TILE_URL, { 
                 attribution: TILE_ATTRIB, 
