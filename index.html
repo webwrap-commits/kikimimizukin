@@ -167,9 +167,9 @@
         const SUPABASE_URL = 'https://ciklywhqswbujsogqiva.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpa2x5d2hxc3didWpzb2dxaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MzAyNzcsImV4cCI6MjA4NDUwNjI3N30._REwuc__qmpW1eQVhfm-RvsoMJCGYXjqtqBVn4w48Oc';
         
-        // 共通のタイル設定（Esri World Gray Canvas）
-        const TILE_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}';
-        const TILE_ATTRIB = 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ';
+        // 日本の地理院タイル（淡色）
+        const TILE_URL = 'https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png';
+        const TILE_ATTRIB = '&copy; <a href="https://maps.gsi.go.jp/development/ichiran.html">国土地理院</a>';
 
         let supabaseClient;
         let posts = [];
@@ -316,6 +316,7 @@
                 if (currentTab === 'my') filtered = posts.filter(p => p.user_id === userId && p.status === 'published');
                 if (currentTab === 'fav') {
                     const favIds = JSON.parse(localStorage.getItem('kikimimi_favs') || '[]');
+                    filtered = posts.filter(favIds.includes(String(p.id))); // 修正箇所：filterの書き方
                     filtered = posts.filter(p => favIds.includes(String(p.id)));
                 }
                 if (currentTab === 'draft') filtered = myDrafts;
@@ -388,8 +389,8 @@
             if(!mapDiv) return;
             mapDiv.style.display = 'block';
             document.getElementById(`btn-map-${suffix}-${id}`).style.display = 'none';
-            const map = L.map(mapId).setView([lat, lng], 16);
-            L.tileLayer(TILE_URL, { attribution: TILE_ATTRIB }).addTo(map);
+            const map = L.map(mapId).setView([lat, lng], 17);
+            L.tileLayer(TILE_URL, { attribution: TILE_ATTRIB, maxZoom: 18 }).addTo(map);
             L.marker([lat, lng]).addTo(map);
             setTimeout(() => { map.invalidateSize(); }, 200);
         }
@@ -398,7 +399,7 @@
             document.getElementById('map-dialog').showModal();
             if (!selectorMap) {
                 selectorMap = L.map('map-selector').setView([35.6812, 139.7671], 15);
-                L.tileLayer(TILE_URL, { attribution: TILE_ATTRIB }).addTo(selectorMap);
+                L.tileLayer(TILE_URL, { attribution: TILE_ATTRIB, maxZoom: 18 }).addTo(selectorMap);
                 selectorMap.on('click', e => updateSelectorMarker(e.latlng));
             }
             document.getElementById('map-search-bar').style.display = (mode === 'search') ? 'flex' : 'none';
