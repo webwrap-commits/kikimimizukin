@@ -379,4 +379,36 @@
                     updateSelectorMarker(latlng);
                 });
             }
-            setTimeout(() => {
+            setTimeout(() => { selectorMap.invalidateSize(); }, 300);
+        }
+
+        function updateSelectorMarker(latlng) {
+            if (selectorMarker) selectorMap.removeLayer(selectorMarker);
+            selectorMarker = L.marker(latlng).addTo(selectorMap);
+            selectedLatLng = latlng;
+        }
+
+        async function searchLocation() {
+            const query = document.getElementById('map-search-input').value;
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+            const data = await res.json();
+            if (data.length > 0) {
+                const latlng = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+                selectorMap.setView(latlng, 16);
+                updateSelectorMarker(latlng);
+            }
+        }
+
+        function confirmLocation() { if (selectedLatLng) { document.getElementById('selected-location').style.display = 'flex'; document.getElementById('map-dialog').close(); } }
+        function openEditor() { document.getElementById('intro-card-area').style.display = 'none'; document.getElementById('action-btn-area').style.display = 'none'; document.getElementById('editor-container').style.display = 'flex'; if (bgm.paused) playAudio(); }
+        function closeEditor() { document.getElementById('intro-card-area').style.display = 'block'; document.getElementById('action-btn-area').style.display = 'block'; document.getElementById('editor-container').style.display = 'none'; editingDraftId = null; document.getElementById('pen-name').value = ''; document.getElementById('place-name').value = ''; document.getElementById('post-content').value = ''; document.getElementById('selected-location').style.display = 'none'; selectedLatLng = null; }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                loadPosts();
+            } catch(e) { console.error("初期化エラー", e); }
+        });
+    </script>
+</body>
+</html>
