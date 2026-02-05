@@ -82,7 +82,11 @@
     </header>
 
     <main>
-        <button id="audio-toggle" class="audio-control-btn">
+        <audio id="bgm" loop preload="auto">
+            <source src="https://res.cloudinary.com/dh6zibjr8/video/upload/v1770109967/Untitled_1_ehkluw.mp3" type="audio/mpeg">
+        </audio>
+
+        <button id="audio-toggle" class="audio-control-btn" onclick="toggleAudio()">
             <span id="audio-icon" class="material-symbols-outlined" style="font-size: 1rem;">volume_off</span>
             <span id="audio-text">静寂の中</span>
         </button>
@@ -153,7 +157,32 @@
         let posts = [{ id: 1, penName: '旅人', placeName: '湊橋のたもと', content: '古い石碑に、かつてここが海の入り口だったと書いてありました。今はビルが立ち並んでいますが、目を閉じると波の音が聞こえてくるようです。', date: '2026/02/04', isFav: false, lat: 35.6812, lng: 139.7671 }];
         let currentTab = 'my';
         let selectorMap, selectorMarker, selectedLatLng = null;
-        let postMaps = {}; // 各カードの地図オブジェクトを保持
+        let postMaps = {};
+        const bgm = document.getElementById('bgm');
+
+        // 音声制御の基本関数
+        function playAudio() {
+            bgm.play().catch(e => console.log("再生失敗:", e));
+            document.getElementById('audio-icon').innerText = 'volume_up';
+            document.getElementById('audio-text').innerText = '音を奏でています';
+        }
+
+        function pauseAudio() {
+            bgm.pause();
+            document.getElementById('audio-icon').innerText = 'volume_off';
+            document.getElementById('audio-text').innerText = '静寂の中';
+        }
+
+        function toggleAudio() {
+            if (bgm.paused) { playAudio(); } else { pauseAudio(); }
+        }
+
+        // スマホでブラウザを閉じたり裏に回した時の挙動
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) {
+                pauseAudio(); // 隠れたら止める
+            }
+        });
 
         function showView(viewId) {
             document.querySelectorAll('main > div').forEach(div => div.style.display = 'none');
@@ -236,7 +265,6 @@
             mapDiv.style.display = 'block';
             btn.style.display = 'none';
 
-            // もし既にそのIDで地図が存在していたら削除する（タブ切り替え対策）
             if (postMaps[mapId]) {
                 postMaps[mapId].remove();
             }
@@ -245,7 +273,7 @@
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
             L.marker([lat, lng]).addTo(map);
             
-            postMaps[mapId] = map; // 管理用オブジェクトに保存
+            postMaps[mapId] = map;
 
             setTimeout(() => { map.invalidateSize(); }, 200);
         }
@@ -315,6 +343,11 @@
             document.getElementById('intro-card-area').style.display = 'none';
             document.getElementById('action-btn-area').style.display = 'none';
             document.getElementById('editor-container').style.display = 'flex';
+            
+            // 投稿フォームを表示したタイミングで音を鳴らす
+            if (bgm.paused) {
+                playAudio();
+            }
         }
 
         function closeEditor() {
@@ -350,7 +383,11 @@
             }, 1000);
         }
 
-        window.onload = renderPosts;
+        window.onload = () => {
+            // 初期状態は音を止めておく
+            pauseAudio();
+            renderPosts();
+        };
     </script>
 </body>
 </html>
