@@ -34,12 +34,9 @@
         .btn-submit { background: var(--foreground); color: white; padding: 1rem; border-radius: 3rem; width: 100%; border: none; cursor: pointer; font-family: var(--font-sans); font-weight: 200; font-size: 0.9rem; letter-spacing: 0.2rem; margin-top: 1rem; }
         .btn-draft { background: white; color: var(--foreground); border: 1px solid var(--foreground); padding: 0.8rem; border-radius: 3rem; width: 100%; cursor: pointer; font-family: var(--font-sans); font-weight: 200; font-size: 0.9rem; letter-spacing: 0.2rem; margin-top: 0.5rem; }
         .btn-cancel { text-align:center; padding:1.5rem 1rem 0; cursor:pointer; font-size:0.8rem; color:var(--muted-foreground); }
-        
-        /* ピン留めボタンのレスポンシブ修正 */
         .pin-actions { display: flex; flex-direction: row; gap: 0.8rem; margin-bottom: 1.5rem; width: 100%; }
         .pin-actions .btn-outline { flex: 1; padding: 0.8rem; box-sizing: border-box; justify-content: center; }
         @media (max-width: 600px) { .pin-actions { flex-direction: column; } .pin-actions .btn-outline { width: 100%; } }
-
         #posts-list, #mypage-posts-list { width: 100%; max-width: 42rem; padding: 1rem 1.5rem 5rem; box-sizing: border-box; }
         .card { background-color: var(--card); border: 1px solid var(--border); border-radius: var(--radius-xl); margin-bottom: 2rem; overflow: hidden; }
         .card-inner { padding: 1.5rem; }
@@ -145,7 +142,6 @@
         function playAudio() { bgm.play().catch(e => console.log("再生失敗:", e)); document.getElementById('audio-icon').innerText = 'volume_up'; document.getElementById('audio-text').innerText = '音を奏でています'; }
         function pauseAudio() { bgm.pause(); document.getElementById('audio-icon').innerText = 'volume_off'; document.getElementById('audio-text').innerText = '静寂の中'; }
         function toggleAudio() { if (bgm.paused) playAudio(); else pauseAudio(); }
-        // 画面非表示・ブラウザ閉じる時に確実に止める。再開時はミュート維持
         document.addEventListener('visibilitychange', () => { if (document.hidden) pauseAudio(); });
 
         function showToast(msg) { const toast = document.getElementById('toast'); toast.innerText = msg; toast.style.display = 'block'; toast.classList.remove('toast-animation'); void toast.offsetWidth; toast.classList.add('toast-animation'); setTimeout(() => { toast.style.display = 'none'; }, 3000); }
@@ -200,22 +196,7 @@
         function renderCard(post, suffix) {
             const isDraft = post.status === 'draft';
             const isFav = JSON.parse(localStorage.getItem('kikimimi_favs') || '[]').includes(String(post.id));
-            return `
-                <div class="card">
-                    <div class="card-inner">
-                        <div class="card-header">
-                            <div class="card-header-main">
-                                <div class="place-name-bold">${isDraft ? '<span class="draft-badge">下書き</span>' : ''}${post.place_name}</div>
-                                <div class="author-info-row"><span>@${post.pen_name || '...'}</span>${!isDraft ? `<span>｜</span><span>${new Date(post.created_at).toLocaleDateString()}</span>` : ''}</div>
-                            </div>
-                            ${!isDraft ? `<button class="save-btn ${isFav ? 'active' : ''}" onclick="toggleFav('${post.id}')"><span class="material-symbols-outlined" style="font-size: 1.2rem;">bookmark</span></button>` : ''}
-                        </div>
-                        <div class="card-content">${post.content || ''}</div>
-                    </div>
-                    <div class="reply-section">
-                        ${isDraft ? `<button class="btn-outline" onclick="editDraft(${post.id})"><span>言葉を綴る</span></button><button class="btn-outline btn-danger" onclick="deletePost(${post.id})"><span>削除</span></button>` : `<button id="btn-map-${suffix}-${post.id}" class="btn-outline" onclick="showPostMap(${post.id}, ${post.lat}, ${post.lng}, '${suffix}')"><span>場所を確認</span></button><div id="map-${suffix}-${post.id}" class="post-map"></div>`}
-                    </div>
-                </div>`;
+            return `<div class="card"><div class="card-inner"><div class="card-header"><div class="card-header-main"><div class="place-name-bold">${isDraft ? '<span class="draft-badge">下書き</span>' : ''}${post.place_name}</div><div class="author-info-row"><span>@${post.pen_name || '...'}</span>${!isDraft ? `<span>｜</span><span>${new Date(post.created_at).toLocaleDateString()}</span>` : ''}</div></div>${!isDraft ? `<button class="save-btn ${isFav ? 'active' : ''}" onclick="toggleFav('${post.id}')"><span class="material-symbols-outlined" style="font-size: 1.2rem;">bookmark</span></button>` : ''}</div><div class="card-content">${post.content || ''}</div></div><div class="reply-section">${isDraft ? `<button class="btn-outline" onclick="editDraft(${post.id})"><span>言葉を綴る</span></button><button class="btn-outline btn-danger" onclick="deletePost(${post.id})"><span>削除</span></button>` : `<button id="btn-map-${suffix}-${post.id}" class="btn-outline" onclick="showPostMap(${post.id}, ${post.lat}, ${post.lng}, '${suffix}')"><span>場所を確認</span></button><div id="map-${suffix}-${post.id}" class="post-map"></div>`}</div></div>`;
         }
         function editDraft(id) { const draft = posts.find(p => p.id === id); if (!draft) return; editingDraftId = id; selectedLatLng = { lat: draft.lat, lng: draft.lng }; document.getElementById('pen-name').value = draft.pen_name || ''; document.getElementById('place-name').value = draft.place_name || ''; document.getElementById('post-content').value = draft.content || ''; if(selectedLatLng && selectedLatLng.lat !== 0) document.getElementById('selected-location').style.display = 'flex'; showView('top-view'); openEditor(); }
         function toggleFav(id) { let favs = JSON.parse(localStorage.getItem('kikimimi_favs') || '[]'); id = String(id); if (favs.includes(id)) favs = favs.filter(f => f !== id); else favs.push(id); localStorage.setItem('kikimimi_favs', JSON.stringify(favs)); renderPosts(); }
@@ -224,7 +205,12 @@
         function updateSelectorMarker(latlng) { if (selectorMarker) selectorMap.removeLayer(selectorMarker); selectorMarker = L.marker(latlng).addTo(selectorMap); selectedLatLng = latlng; }
         async function searchLocation() { const query = document.getElementById('map-search-input').value; const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`); const data = await res.json(); if (data.length > 0) { const latlng = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) }; selectorMap.setView(latlng, 13); updateSelectorMarker(latlng); } }
         function confirmLocation() { if (selectedLatLng) { document.getElementById('selected-location').style.display = 'flex'; document.getElementById('map-dialog').close(); } }
-        function openEditor() { document.getElementById('intro-card-area').style.display = 'none'; document.getElementById('action-btn-area').style.display = 'none'; document.getElementById('editor-container').style.display = 'flex'; }
+        function openEditor() { 
+            document.getElementById('intro-card-area').style.display = 'none'; 
+            document.getElementById('action-btn-area').style.display = 'none'; 
+            document.getElementById('editor-container').style.display = 'flex'; 
+            if (bgm.paused) playAudio();
+        }
         function closeEditor() { document.getElementById('intro-card-area').style.display = 'block'; document.getElementById('action-btn-area').style.display = 'block'; document.getElementById('editor-container').style.display = 'none'; editingDraftId = null; document.getElementById('pen-name').value = ''; document.getElementById('place-name').value = ''; document.getElementById('post-content').value = ''; document.getElementById('selected-location').style.display = 'none'; selectedLatLng = null; }
         document.addEventListener('DOMContentLoaded', () => { try { supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); loadPosts(); } catch(e) { console.error(e); } });
     </script>
